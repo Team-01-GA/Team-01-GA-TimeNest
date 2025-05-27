@@ -1,23 +1,26 @@
 import { createContext } from 'react';
-import { User } from 'firebase/auth';
- 
+import type { User } from 'firebase/auth';
+
 export interface UserData {
   name?: string;
   email?: string;
-  [key: string]: any;
+  [key: string]: unknown; // ✅ avoid `any`
 }
- 
+
 export interface AppContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
+
   userData: UserData | null;
-  setContext: React.Dispatch<React.SetStateAction<AppContextType>>;
+  setUserData: (data: UserData | null) => void;
 }
- 
-// Default context value
+
 const AppContext = createContext<AppContextType>({
   user: null,
+  setUser: () => {},
+
   userData: null,
-  setContext: () => {}, // default no-op
+  setUserData: () => {},
 });
- 
+
 export default AppContext;
