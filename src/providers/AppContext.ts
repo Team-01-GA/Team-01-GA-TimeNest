@@ -4,7 +4,7 @@ import type { User } from 'firebase/auth';
 export interface UserData {
   name?: string;
   email?: string;
-  [key: string]: unknown; // ✅ avoid `any`
+  [key: string]: unknown;
 }
 
 export interface AppContextType {
