@@ -9,6 +9,7 @@ import type { AppContextType, UserData } from './providers/AppContext';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
+import CalendarPage from './pages/CalendarPage/CalendarPage';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -54,6 +55,7 @@ function App() {
                 >
                     <Routes>
                         {!user && <Route path="/" element={<HomePage />} />}
+                        <Route path="/calendar" element={<CalendarPage />} />
                     </Routes>
                 </div>
             </BrowserRouter>
