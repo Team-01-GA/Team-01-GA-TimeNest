@@ -2,8 +2,10 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 
+const API_KEY: string = import.meta.env.VITE_API_KEY;
+
 const firebaseConfig = {
-    apiKey: 'AIzaSyA0lPgwADFIECTn-EKDdNpyUkyUIbcSJ3g',
+    apiKey: API_KEY,
     authDomain: 'team-01-ga-timenest.firebaseapp.com',
     projectId: 'team-01-ga-timenest',
     storageBucket: 'team-01-ga-timenest.firebasestorage.app',
