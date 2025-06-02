@@ -6,12 +6,12 @@ function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   return (
-    <div className="flex justify-center items-start bg-base-100 min-h-screen p-8">
+    <div className="flex justify-center items-center bg-base-100 min-h-screen p-4 md:p-8">
 
-      <div className="flex w-full max-w-6xl gap-6">
+      <div className="flex w-full max-w-6xl gap-6 h-[calc(100vh-10rem)] max-h-[750px]">
 
         {/* MonthView */}
-        <div className="w-[700px]">
+        <div className="flex-1 min-w-0 h-full overflow-hidden">
           <MonthView
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
@@ -19,7 +19,7 @@ function CalendarPage() {
         </div>
 
         {/* Sidebar */}
-        <aside className="w-80 bg-base-200 border-l border-base-300 p-4 rounded-2xl">
+        <aside className="w-64 md:w-72 lg:w-80 bg-base-200 border-l border-base-300 p-4 rounded-2xl h-full overflow-hidden">
           <Sidebar selectedDate={selectedDate} />
         </aside>
 

@@ -4,7 +4,7 @@ type SidebarProps = {
 
 function Sidebar({ selectedDate }: SidebarProps) {
     return (
-        <div className="flex flex-col h-full max-h-[670px]"> 
+        <div className="flex flex-col h-full">
 
             {/* Sticky Header */}
             <div className="p-2 border-b border-base-300 shrink-0">
@@ -19,26 +19,13 @@ function Sidebar({ selectedDate }: SidebarProps) {
 
             {/* Scrollable Events */}
             <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                {[...Array(20)].map((_, i) => (
+                {[...Array(50)].map((_, i) => (
                     <div
                         key={i}
                         className="p-2 bg-primary text-primary-content rounded shadow"
                     >
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
-                        Event {i + 1}
+                        <h3 className="font-semibold">Meeting with client</h3>
+                        <p className="text-sm">10:00 – 11:30, Office A</p>
                     </div>
                 ))}
             </div>

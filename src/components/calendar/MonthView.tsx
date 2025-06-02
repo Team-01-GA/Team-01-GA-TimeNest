@@ -38,9 +38,9 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
     });
 
     return (
-        <div className="w-full">
+        <div className="w-full h-full flex flex-col">
             {/* Month Header */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2 shrink-0">
                 <button className="btn btn-sm" onClick={goToPreviousMonth}>←</button>
                 <h2 className="text-lg font-semibold">
                     {visibleDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
@@ -49,21 +49,21 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
             </div>
 
             {/* Today Button */}
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-4 shrink-0">
                 <button className="btn btn-xs btn-outline" onClick={goToToday}>
                     Today
                 </button>
             </div>
 
             {/* Weekday labels */}
-            <div className="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-base-content/70">
+            <div className="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-base-content/70 shrink-0">
                 {WEEKDAY_LABELS.map((label) => (
                     <div key={label}>{label}</div>
                 ))}
             </div>
 
             {/* Day Cells */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-2 flex-1">
                 {days.map((date) => (
                     <DayCell
                         key={date.toISOString()}

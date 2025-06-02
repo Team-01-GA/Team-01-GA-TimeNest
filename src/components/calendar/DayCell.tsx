@@ -8,7 +8,7 @@ type DayCellProps = {
 
 function DayCell({ date, isCurrentMonth, isToday, isSelected, onClick }: DayCellProps) {
     const baseStyle =
-        'aspect-square p-2 border rounded cursor-pointer hover:bg-base-200 transition-all flex items-center justify-center';
+        'h-full border rounded cursor-pointer hover:bg-base-200 transition-all flex items-center justify-center';
     const monthStyle = isCurrentMonth ? '' : ' opacity-50';
     const todayStyle = isToday ? ' bg-primary text-white font-bold' : '';
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
