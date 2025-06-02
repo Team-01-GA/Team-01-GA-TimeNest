@@ -3,7 +3,12 @@ import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
 
-function MonthView() {
+type MonthViewProps = {
+    selectedDate: Date;
+    setSelectedDate: (date: Date) => void;
+};
+
+function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
     const [visibleDate, setVisibleDate] = useState(new Date());
 
     function goToPreviousMonth() {
@@ -20,6 +25,7 @@ function MonthView() {
 
     function goToToday() {
         setVisibleDate(new Date());
+        setSelectedDate(new Date());
     }
 
     const start = getMonthStartForCalendarGrid(visibleDate);
@@ -32,7 +38,7 @@ function MonthView() {
     });
 
     return (
-        <div className="max-w-screen-md mx-auto">
+        <div className="w-full">
             {/* Month Header */}
             <div className="flex items-center justify-between mb-2">
                 <button className="btn btn-sm" onClick={goToPreviousMonth}>←</button>
@@ -64,6 +70,8 @@ function MonthView() {
                         date={date}
                         isToday={isSameCalendarDay(date, new Date())}
                         isCurrentMonth={date.getMonth() === currentMonth}
+                        onClick={() => setSelectedDate(date)}
+                        isSelected={isSameCalendarDay(date, selectedDate)}
                     />
                 ))}
             </div>
