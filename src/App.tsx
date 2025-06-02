@@ -10,10 +10,22 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
+import ModalContext from './providers/ModalContext';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
+
+    const [modalKey, setModalKey] = useState<string | null>(null);
+
+    const openModal = (key: string) => setModalKey(key);
+    const closeModal = () => setModalKey(null);
+
+    const modalContextValue = {
+        modalKey,
+        openModal,
+        closeModal,
+    };
 
     const [firebaseUser, loading, error] = useAuthState(auth);
 
@@ -48,17 +60,22 @@ function App() {
 
     return (
         <AppContext.Provider value={contextValue}>
-            <BrowserRouter>
-                <div
-                    id="main-app"
-                    className="flex flex-col w-full h-[calc(100vh-3.5rem)] mt-14"
-                >
-                    <Routes>
-                        {!user && <Route path="/" element={<HomePage />} />}
-                        <Route path="/calendar" element={<CalendarPage />} />
-                    </Routes>
-                </div>
-            </BrowserRouter>
+            <ModalContext.Provider value={modalContextValue}>
+                <BrowserRouter>
+                    <div
+                        id="main-app"
+                        className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
+                    >
+                        <Routes>
+                            {!user && <Route path="/" element={<HomePage />} />}
+                            <Route
+                                path="/calendar"
+                                element={<CalendarPage />}
+                            />
+                        </Routes>
+                    </div>
+                </BrowserRouter>
+            </ModalContext.Provider>
         </AppContext.Provider>
     );
 }
