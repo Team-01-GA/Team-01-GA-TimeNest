@@ -1,14 +1,35 @@
+import { useState } from 'react';
+import EventList from './EventList';
+import ContactList from './ContactList';
+
 type SidebarProps = {
     selectedDate: Date;
 };
 
 function Sidebar({ selectedDate }: SidebarProps) {
+    const [activeTab, setActiveTab] = useState<'day' | 'contacts'>('day');
+
     return (
         <div className="flex flex-col h-full">
 
-            {/* Sticky Header */}
-            <div className="p-2 border-b border-base-300 shrink-0">
-                <h2 className="text-lg font-semibold">
+            {/* Sticky Top Controls */}
+            <div className="p-2 border-b border-base-300 shrink-0 sticky top-0 bg-base-200 z-10">
+                <div className="flex justify-center mb-2">
+                    <button
+                        className={`btn btn-xs rounded-r-none ${activeTab === 'day' ? 'btn-primary' : 'btn-outline'}`}
+                        onClick={() => setActiveTab('day')}
+                    >
+                        Day
+                    </button>
+                    <button
+                        className={`btn btn-xs rounded-l-none ${activeTab === 'contacts' ? 'btn-primary' : 'btn-outline'}`}
+                        onClick={() => setActiveTab('contacts')}
+                    >
+                        Contacts
+                    </button>
+                </div>
+
+                <h2 className="text-lg font-semibold text-center">
                     {selectedDate.toLocaleDateString('en-GB', {
                         day: '2-digit',
                         month: 'long',
@@ -17,19 +38,8 @@ function Sidebar({ selectedDate }: SidebarProps) {
                 </h2>
             </div>
 
-            {/* Scrollable Events */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                {[...Array(50)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="p-2 bg-primary text-primary-content rounded shadow"
-                    >
-                        <h3 className="font-semibold">Meeting with client</h3>
-                        <p className="text-sm">10:00 – 11:30, Office A</p>
-                    </div>
-                ))}
-            </div>
-
+            {/* Scrollable View */}
+            {activeTab === 'day' ? <EventList /> : <ContactList />}
         </div>
     );
 }
