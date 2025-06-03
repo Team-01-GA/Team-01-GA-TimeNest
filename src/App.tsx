@@ -11,7 +11,7 @@ import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
 import ModalContext from './providers/ModalContext';
-import type { AlertTypes } from './constants/alert.constants';
+import { AlertTypes } from './constants/alert.constants';
 import delay from './constants/delay';
 import AlertContext from './providers/AlertContext';
 import Alert from './components/Alert/Alert';
@@ -87,6 +87,11 @@ function App() {
     };
 
     if (loading || userLoading) return <Loader />;
+
+    if (error) {
+        showAlert(AlertTypes.ERROR, error.message);
+        return <Alert />;
+    }
 
     return (
         <AppContext.Provider value={contextValue}>
