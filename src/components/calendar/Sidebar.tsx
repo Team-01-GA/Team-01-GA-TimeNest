@@ -13,7 +13,7 @@ function Sidebar({ selectedDate }: SidebarProps) {
         <div className="flex flex-col h-full">
 
             {/* Sticky Top Controls */}
-            <div className="p-2 border-b border-base-300 shrink-0 sticky top-0 bg-base-200 z-10">
+            <div className="p-2 border-b border-base-300 shrink-0 sticky top-0 bg-base-300 z-10">
                 <div className="flex justify-center mb-2">
                     <button
                         className={`btn btn-xs rounded-r-none ${activeTab === 'day' ? 'btn-primary' : 'btn-outline'}`}

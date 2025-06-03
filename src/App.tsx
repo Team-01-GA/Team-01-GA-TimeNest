@@ -6,7 +6,7 @@ import { DataSnapshot } from 'firebase/database';
 import { auth } from './config/firebase-config';
 import AppContext from './providers/AppContext';
 import type { AppContextType, UserData } from './providers/AppContext';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
@@ -15,10 +15,12 @@ import type { AlertTypes } from './constants/alert.constants';
 import delay from './constants/delay';
 import AlertContext from './providers/AlertContext';
 import Alert from './components/Alert/Alert';
+import Loader from './components/Loader/Loader';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
+    const [userLoading, setUserLoading] = useState<boolean>(false);
 
     const [modalKey, setModalKey] = useState<string | null>(null);
 
@@ -51,6 +53,7 @@ function App() {
     const [firebaseUser, loading, error] = useAuthState(auth);
 
     useEffect(() => {
+        setUserLoading(true);
         if (!firebaseUser) {
             setUser(null);
             setUserData(null);
@@ -69,7 +72,11 @@ function App() {
             })
             .catch((err) => {
                 console.error(err.message);
-            });
+            })
+            .finally(() => {
+                setUserLoading(false);
+            })
+        
     }, [firebaseUser]);
 
     const contextValue: AppContextType = {
@@ -78,6 +85,8 @@ function App() {
         userData,
         setUserData,
     };
+
+    if (loading || userLoading) return <Loader />;
 
     return (
         <AppContext.Provider value={contextValue}>
@@ -90,13 +99,17 @@ function App() {
                             className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
                         >
                             <Routes>
-                                {!user && (
-                                    <Route path="/" element={<HomePage />} />
+                                {!user ? (
+                                    <>
+                                        <Route path="/welcome" element={<HomePage />} />
+                                        <Route path="*" element={<Navigate to="/welcome" replace />} />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Route path="/app" element={<CalendarPage />} />
+                                        <Route path="*" element={<Navigate to="/app" replace />} />
+                                    </>
                                 )}
-                                <Route
-                                    path="/calendar"
-                                    element={<CalendarPage />}
-                                />
                             </Routes>
                         </div>
                     </BrowserRouter>

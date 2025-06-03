@@ -42,7 +42,7 @@ function Login() {
                 setUser(credential.user);
             })
             .then(() => {
-                navigate('/');
+                navigate('/calendar');
             })
             .catch((e: unknown) => {
                 if (e instanceof Error) {
@@ -65,7 +65,10 @@ function Login() {
     };
 
     return (
-        <div>
+        <form onSubmit={e => {
+            e.preventDefault();
+            onLogin();
+        }}>
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 gap-4">
                 <label className="floating-label">
                     <span>Email</span>
@@ -91,11 +94,11 @@ function Login() {
                         onChange={(e) => saveInputs('password', e.target.value)}
                     />
                 </label>
-                <button className='btn btn-primary btn-lg mt-4' onClick={onLogin}>
+                <button className='btn btn-primary btn-lg mt-4 relative'>
                     Sign in
                 </button>
             </fieldset>
-        </div>
+        </form>
     );
 }
 

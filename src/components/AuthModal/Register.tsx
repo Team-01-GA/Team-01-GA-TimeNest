@@ -53,7 +53,7 @@ function Register() {
             showAlert(AlertTypes.WARNING, 'Last name must be between 1 and 30 characters, without spaces or digits.');
             return;
         }
-        if (!fields.handle || fields.handle.includes(' ') || /\d/.test(fields.handle) || fields.handle.length < HANDLE_MIN_LENGTH || fields.handle.length > HANDLE_MAX_LENGTH) {
+        if (!fields.handle || fields.handle.includes(' ') || fields.handle.length < HANDLE_MIN_LENGTH || fields.handle.length > HANDLE_MAX_LENGTH) {
             showAlert(AlertTypes.WARNING, 'Username must be between 3 and 30 characters, without spaces.');
             return;
         }
@@ -86,7 +86,7 @@ function Register() {
 
             setUser(credential.user);
 
-            navigate('/');
+            navigate('/calendar');
         }
         catch (e: unknown) {
             if (e instanceof Error) {
@@ -105,7 +105,10 @@ function Register() {
     };
 
     return (
-        <div>
+        <form onSubmit={e => {
+            e.preventDefault();
+            onRegister();
+        }}>
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 gap-4">
                 <div className='flex flex-row gap-2 w-full'>
                     <label className="floating-label w-1/2">
@@ -129,9 +132,11 @@ function Register() {
                     <span>Password</span>
                     <input className="input input-lg w-full" name='new-password' placeholder='1234567' type="password" autoComplete='new-password' value={fields.password} onChange={e => saveInputs('password', e.target.value)}/>
                 </label>
-                <button className='btn btn-primary btn-lg mt-4' onClick={onRegister}>Sign up</button>
+                <button className='btn btn-primary btn-lg mt-4 relative' type='submit'>
+                    Sign up
+                </button>
             </fieldset>
-        </div>
+        </form>
     );
 };
 
