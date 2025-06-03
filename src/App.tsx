@@ -11,6 +11,10 @@ import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
 import ModalContext from './providers/ModalContext';
+import type { AlertTypes } from './constants/alert.constants';
+import delay from './constants/delay';
+import AlertContext from './providers/AlertContext';
+import Alert from './components/Alert/Alert';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -25,6 +29,23 @@ function App() {
         modalKey,
         openModal,
         closeModal,
+    };
+
+    const [alertType, setAlertType] = useState<AlertTypes | null>(null);
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+    const showAlert = async (alertTypeParam: AlertTypes, alertMessageParam: string | null) => {
+        setAlertMessage(alertMessageParam);
+        setAlertType(alertTypeParam);
+        await delay(5000);
+        setAlertType(null);
+        setAlertMessage(null);
+    };
+
+    const AlertContextValue = {
+        alertMessage,
+        alertType,
+        showAlert,
     };
 
     const [firebaseUser, loading, error] = useAuthState(auth);
@@ -60,22 +81,27 @@ function App() {
 
     return (
         <AppContext.Provider value={contextValue}>
-            <ModalContext.Provider value={modalContextValue}>
-                <BrowserRouter>
-                    <div
-                        id="main-app"
-                        className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
-                    >
-                        <Routes>
-                            {!user && <Route path="/" element={<HomePage />} />}
-                            <Route
-                                path="/calendar"
-                                element={<CalendarPage />}
-                            />
-                        </Routes>
-                    </div>
-                </BrowserRouter>
-            </ModalContext.Provider>
+            <AlertContext.Provider value={AlertContextValue}>
+                <Alert />
+                <ModalContext.Provider value={modalContextValue}>
+                    <BrowserRouter>
+                        <div
+                            id="main-app"
+                            className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
+                        >
+                            <Routes>
+                                {!user && (
+                                    <Route path="/" element={<HomePage />} />
+                                )}
+                                <Route
+                                    path="/calendar"
+                                    element={<CalendarPage />}
+                                />
+                            </Routes>
+                        </div>
+                    </BrowserRouter>
+                </ModalContext.Provider>
+            </AlertContext.Provider>
         </AppContext.Provider>
     );
 }

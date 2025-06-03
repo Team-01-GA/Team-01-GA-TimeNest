@@ -10,7 +10,7 @@ function HomePage() {
 
     const toggleAuth = (isNewFlag: boolean) => {
         setIsNew(isNewFlag);
-        openModal(ModalKeys.AUTH)
+        openModal(ModalKeys.AUTH);
     }
 
     return (
