@@ -19,6 +19,7 @@ function DayCell({ date, isCurrentMonth, isToday, isSelected, onClick }: DayCell
         <div
             className={`${baseStyle}${monthStyle}${todayStyle}${weekendStyle}${selectedStyle}`}
             onClick={() => onClick?.(date)}
+            data-date={date}
         >
             {date.getDate()}
         </div>

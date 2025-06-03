@@ -57,6 +57,7 @@ function App() {
         if (!firebaseUser) {
             setUser(null);
             setUserData(null);
+            setUserLoading(false);
             return;
         }
 
@@ -75,7 +76,7 @@ function App() {
             })
             .finally(() => {
                 setUserLoading(false);
-            })
+            });
         
     }, [firebaseUser]);
 
