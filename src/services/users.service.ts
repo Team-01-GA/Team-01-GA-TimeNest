@@ -52,6 +52,12 @@ export const createUserObject = async (
 };
 
 
-export const getUserData = (uid: string) => {
-    return get(query(ref(db, 'users'), orderByChild('uid'), equalTo(uid)));
+export const getUserData = async (uid: string) => {
+    try {
+        const snapshot = await get(query(ref(db, 'users'), orderByChild('uid'), equalTo(uid)));
+        return snapshot;
+    } catch (error) {
+        console.error('Error retrieving user data:', error);
+        throw error;
+    }
 };

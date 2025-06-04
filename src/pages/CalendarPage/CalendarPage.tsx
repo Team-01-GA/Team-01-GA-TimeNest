@@ -1,31 +1,38 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import MonthView from '../../components/calendar/MonthView';
 import Sidebar from '../../components/calendar/Sidebar';
+import CreateEventModal from '../../components/EventModal/CreateEventModal';
+import { ModalKeys } from '../../constants/modal.constants';
+import ModalContext from '../../providers/ModalContext';
 
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const { modalKey } = useContext(ModalContext);
 
   return (
-    <div className="flex justify-center items-center p-4 md:p-8">
+    <>
+      <div className="flex justify-center items-center p-4 md:p-8">
 
-      <div className="flex w-full gap-6 h-[calc(100vh-10rem)]">
+        <div className="flex w-full gap-6 h-[calc(100vh-10rem)]">
 
-        {/* MonthView */}
-        <div className="flex-1 min-w-0 h-full overflow-hidden">
-          <MonthView
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
+          {/* MonthView */}
+          <div className="flex-1 min-w-0 h-full overflow-hidden">
+            <MonthView
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+            />
+          </div>
+
+          {/* Sidebar */}
+          <aside className="w-64 md:w-72 lg:w-80 bg-base-300 p-4 rounded-2xl h-full overflow-hidden">
+            <Sidebar selectedDate={selectedDate} />
+          </aside>
+
         </div>
-
-        {/* Sidebar */}
-        <aside className="w-64 md:w-72 lg:w-80 bg-base-300 p-4 rounded-2xl h-full overflow-hidden">
-          <Sidebar selectedDate={selectedDate} />
-        </aside>
-
       </div>
 
-    </div>
+      <CreateEventModal visible={modalKey === ModalKeys.CREATE_EVENT} />
+    </>
   );
 }
 

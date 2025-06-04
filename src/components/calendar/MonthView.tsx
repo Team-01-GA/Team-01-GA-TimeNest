@@ -2,6 +2,9 @@ import { useState } from 'react';
 import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
+import { useContext } from 'react';
+import ModalContext from '../../providers/ModalContext';
+import { ModalKeys, ModalIcons } from '../../constants/modal.constants';
 
 type MonthViewProps = {
     selectedDate: Date;
@@ -10,6 +13,7 @@ type MonthViewProps = {
 
 function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
     const [visibleDate, setVisibleDate] = useState(new Date());
+    const { openModal } = useContext(ModalContext);
 
     function goToPreviousMonth() {
         const prev = new Date(visibleDate);
@@ -48,10 +52,23 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
                 <button className="btn btn-sm" onClick={goToNextMonth}>→</button>
             </div>
 
-            {/* Today Button */}
+            {/* Today Button
             <div className="flex justify-center mb-4 shrink-0">
                 <button className="btn btn-xs btn-outline" onClick={goToToday}>
                     Today
+                </button>
+            </div> */}
+
+            <div className="flex flex-col items-center gap-2 mb-4 shrink-0">
+                <button className="btn btn-xs btn-outline" onClick={goToToday}>
+                    Today
+                </button>
+                <button
+                    className="btn btn-sm btn-accent flex items-center gap-2"
+                    onClick={() => openModal(ModalKeys.CREATE_EVENT)}
+                >
+                    <i className={ModalIcons.CREATE_EVENT}></i>
+                    Create Event
                 </button>
             </div>
 

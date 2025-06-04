@@ -63,13 +63,29 @@ function App() {
 
         setUser(firebaseUser);
 
+        // getUserData(firebaseUser.uid)
+        //     .then((snapshot: DataSnapshot) => {
+        //         if (!snapshot.exists()) {
+        //             throw new Error('User data not found');
+        //         }
+        //         const data = snapshot.val();
+        //         setUserData(data);
+        //     })
         getUserData(firebaseUser.uid)
             .then((snapshot: DataSnapshot) => {
                 if (!snapshot.exists()) {
                     throw new Error('User data not found');
                 }
-                const data = snapshot.val();
-                setUserData(data);
+                const usersObj = snapshot.val();
+                // Extract first user from the query result
+                const firstUser = Object.values(usersObj)[0] as UserData;
+                
+                // Ensure handle is present
+                if (!firstUser.handle) {
+                    throw new Error('User profile incomplete - missing handle');
+                }
+                
+                setUserData(firstUser as UserData);
             })
             .catch((err) => {
                 console.error(err.message);
@@ -77,7 +93,7 @@ function App() {
             .finally(() => {
                 setUserLoading(false);
             });
-        
+
     }, [firebaseUser]);
 
     const contextValue: AppContextType = {

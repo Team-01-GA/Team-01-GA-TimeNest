@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import EventList from './EventList';
 import ContactList from './ContactList';
+import ModalContext from '../../providers/ModalContext';
+
 
 type SidebarProps = {
     selectedDate: Date;
@@ -8,9 +10,16 @@ type SidebarProps = {
 
 function Sidebar({ selectedDate }: SidebarProps) {
     const [activeTab, setActiveTab] = useState<'day' | 'contacts'>('day');
+    const { modalKey } = useContext(ModalContext);
+
+    const isAnyModalOpen = modalKey !== null;
 
     return (
-        <div className="flex flex-col h-full">
+        // <div className="flex flex-col h-full">
+        <div
+            className={`flex flex-col h-full transition-all duration-300 ${isAnyModalOpen ? 'opacity-40 pointer-events-none blur-sm' : ''
+                }`}
+        >
 
             {/* Sticky Top Controls */}
             <div className="p-2 border-b border-base-300 shrink-0 sticky top-0 bg-base-300 z-10">

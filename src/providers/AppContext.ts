@@ -4,8 +4,20 @@ import type { User } from 'firebase/auth';
 export interface UserData {
   name?: string;
   email?: string;
+  handle: string;
   [key: string]: unknown;
 }
+// export interface UserData {
+//   uid: string;
+//   email: string;
+//   handle: string;
+//   firstName?: string;
+//   lastName?: string;
+//   isAdmin?: boolean;
+//   isBlocked?: boolean;
+//   createdOn?: string;
+//   prefersFullName?: boolean;
+// }
 
 export interface AppContextType {
   user: User | null;
