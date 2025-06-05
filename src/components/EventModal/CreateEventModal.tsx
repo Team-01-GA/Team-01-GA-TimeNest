@@ -16,7 +16,7 @@ function CreateEventModal() {
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
     const [location, setLocation] = useState('');
-    const [recurrence, setRecurrence] = useState('');
+    const [recurrence, setRecurrence] = useState<string[]>([]);
     const [isPublic, setIsPublic] = useState(true);
     const [loading, setLoading] = useState(false);
 
@@ -29,11 +29,17 @@ function CreateEventModal() {
         setStart('');
         setEnd('');
         setLocation('');
-        setRecurrence('');
+        setRecurrence([]);
         setIsPublic(true);
         setLoading(false);
 
     }, [urlPath]);
+
+    const toggleDay = (day: string) => {
+        setRecurrence((prev) =>
+            prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+        );
+    };
 
     const handleSubmit = async () => {
 
@@ -69,7 +75,7 @@ function CreateEventModal() {
                 participants: [userData.handle],
                 isPublic,
                 location,
-                recurrence: recurrence || 'no'
+                recurrence,
             });
 
             showAlert(AlertTypes.SUCCESS, 'Event created successfully!');
@@ -127,15 +133,20 @@ function CreateEventModal() {
                     onChange={(e) => setLocation(e.target.value)}
                 />
                 <div className="form-control">
-                    <select
-                        className="select select-bordered"
-                        value={recurrence}
-                        onChange={(e) => setRecurrence(e.target.value)}
-                    >
-                        <option value="">No recurrence</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                    </select>
+                    <label className="label-text mb-1">Repeats on:</label>
+                    <div className="grid grid-cols-4 gap-2">
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+                            <label key={day} className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    className="checkbox checkbox-sm"
+                                    checked={recurrence.includes(day)}
+                                    onChange={() => toggleDay(day)}
+                                />
+                                <span className="text-sm">{day}</span>
+                            </label>
+                        ))}
+                    </div>
                 </div>
                 <label className="label cursor-pointer">
                     <span className="label-text">Public</span>

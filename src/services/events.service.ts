@@ -12,7 +12,7 @@ export interface EventData {
     participants: string[];
     isPublic: boolean;
     location?: string;
-    recurrence?: string;
+    recurrence?: string[];
 }
 
 export const addEvent = async (event: EventData) => {
