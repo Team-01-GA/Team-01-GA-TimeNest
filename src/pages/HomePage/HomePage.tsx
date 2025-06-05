@@ -1,16 +1,17 @@
-import { useContext, useState } from "react";
-import AuthModal from "../../components/AuthModal/AuthModal";
-import { ModalKeys } from "../../constants/modal.constants";
-import ModalContext from "../../providers/ModalContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AnimatedOutlet from "../../components/AnimatedOutlet";
+import { NewUserContext } from "../../providers/NewUserContext";
 
 function HomePage() {
 
-    const { modalKey, openModal } = useContext(ModalContext);
     const [isNew, setIsNew] = useState<boolean>(true);
+    
+    const navigate = useNavigate();
 
     const toggleAuth = (isNewFlag: boolean) => {
         setIsNew(isNewFlag);
-        openModal(ModalKeys.AUTH);
+        navigate('/welcome/auth');
     }
 
     return (
@@ -28,7 +29,9 @@ function HomePage() {
                 <p className="text-xl">Already a member?</p>
                 <button onClick={() => toggleAuth(false)} className="btn btn-accent btn-outline btn-lg">Sign in</button>
             </div>
-            <AuthModal isNew={isNew} visible={modalKey === ModalKeys.AUTH}></AuthModal>
+            <NewUserContext.Provider value={{ isNew }}>
+                <AnimatedOutlet />
+            </NewUserContext.Provider>
         </div>
     )
 }

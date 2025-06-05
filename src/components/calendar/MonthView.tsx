@@ -2,9 +2,8 @@ import { useState } from 'react';
 import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
-import { useContext } from 'react';
-import ModalContext from '../../providers/ModalContext';
-import { ModalKeys, ModalIcons } from '../../constants/modal.constants';
+import { ModalIcons } from '../../constants/modal.constants';
+import { useNavigate } from 'react-router-dom';
 
 type MonthViewProps = {
     selectedDate: Date;
@@ -13,7 +12,8 @@ type MonthViewProps = {
 
 function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
     const [visibleDate, setVisibleDate] = useState(new Date());
-    const { openModal } = useContext(ModalContext);
+    
+    const navigate = useNavigate();
 
     function goToPreviousMonth() {
         const prev = new Date(visibleDate);
@@ -65,7 +65,7 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
                 </button>
                 <button
                     className="btn btn-sm btn-accent flex items-center gap-2"
-                    onClick={() => openModal(ModalKeys.CREATE_EVENT)}
+                    onClick={() => navigate('/app/event/create')}
                 >
                     <i className={ModalIcons.CREATE_EVENT}></i>
                     Create Event

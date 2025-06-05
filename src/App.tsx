@@ -10,28 +10,19 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
-import ModalContext from './providers/ModalContext';
 import { AlertTypes } from './constants/alert.constants';
-import delay from './constants/delay';
+import delay from './utils/delay';
 import AlertContext from './providers/AlertContext';
 import Alert from './components/Alert/Alert';
 import Loader from './components/Loader/Loader';
+import AuthModal from './components/AuthModal/AuthModal';
+import { AnimatePresence } from 'framer-motion';
+import CreateEventModal from './components/EventModal/CreateEventModal';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [userLoading, setUserLoading] = useState<boolean>(false);
-
-    const [modalKey, setModalKey] = useState<string | null>(null);
-
-    const openModal = (key: string) => setModalKey(key);
-    const closeModal = () => setModalKey(null);
-
-    const modalContextValue = {
-        modalKey,
-        openModal,
-        closeModal,
-    };
 
     const [alertType, setAlertType] = useState<AlertTypes | null>(null);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -63,14 +54,6 @@ function App() {
 
         setUser(firebaseUser);
 
-        // getUserData(firebaseUser.uid)
-        //     .then((snapshot: DataSnapshot) => {
-        //         if (!snapshot.exists()) {
-        //             throw new Error('User data not found');
-        //         }
-        //         const data = snapshot.val();
-        //         setUserData(data);
-        //     })
         getUserData(firebaseUser.uid)
             .then((snapshot: DataSnapshot) => {
                 if (!snapshot.exists()) {
@@ -93,7 +76,7 @@ function App() {
             .finally(() => {
                 setUserLoading(false);
             });
-
+        
     }, [firebaseUser]);
 
     const contextValue: AppContextType = {
@@ -114,28 +97,32 @@ function App() {
         <AppContext.Provider value={contextValue}>
             <AlertContext.Provider value={AlertContextValue}>
                 <Alert />
-                <ModalContext.Provider value={modalContextValue}>
-                    <BrowserRouter>
-                        <div
-                            id="main-app"
-                            className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
-                        >
+                <BrowserRouter>
+                    <div
+                        id="main-app"
+                        className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
+                    >
+                        <AnimatePresence mode='wait'>
                             <Routes>
                                 {!user ? (
                                     <>
-                                        <Route path="/welcome" element={<HomePage />} />
+                                        <Route path="/welcome" element={<HomePage />}>
+                                            <Route path='/welcome/auth' element={<AuthModal/>} />
+                                        </Route>
                                         <Route path="*" element={<Navigate to="/welcome" replace />} />
                                     </>
                                 ) : (
                                     <>
-                                        <Route path="/app" element={<CalendarPage />} />
+                                        <Route path="/app" element={<CalendarPage />}>
+                                            <Route path='/app/event/create' element={<CreateEventModal />}/>
+                                        </Route>
                                         <Route path="*" element={<Navigate to="/app" replace />} />
                                     </>
                                 )}
                             </Routes>
-                        </div>
-                    </BrowserRouter>
-                </ModalContext.Provider>
+                        </AnimatePresence>
+                    </div>
+                </BrowserRouter>
             </AlertContext.Provider>
         </AppContext.Provider>
     );

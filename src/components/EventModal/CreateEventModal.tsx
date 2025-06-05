@@ -1,14 +1,13 @@
 import { useContext, useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
-import ModalContext from '../../providers/ModalContext';
 import AppContext from '../../providers/AppContext';
 import AlertContext from '../../providers/AlertContext';
 import { addEvent } from '../../services/events.service';
 import { AlertTypes } from '../../constants/alert.constants';
 import { ModalIcons } from '../../constants/modal.constants';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-function CreateEventModal({ visible }: { visible: boolean }) {
-    const { closeModal } = useContext(ModalContext);
+function CreateEventModal() {
     const { userData } = useContext(AppContext);
     const { showAlert } = useContext(AlertContext);
 
@@ -21,18 +20,20 @@ function CreateEventModal({ visible }: { visible: boolean }) {
     const [isPublic, setIsPublic] = useState(true);
     const [loading, setLoading] = useState(false);
 
+    const urlPath = useLocation();
+    const navigate = useNavigate();
+
     useEffect(() => {
-        if (visible) {
-            setTitle('');
-            setDescription('');
-            setStart('');
-            setEnd('');
-            setLocation('');
-            setRecurrence('');
-            setIsPublic(true);
-            setLoading(false);
-        }
-    }, [visible]);
+        setTitle('');
+        setDescription('');
+        setStart('');
+        setEnd('');
+        setLocation('');
+        setRecurrence('');
+        setIsPublic(true);
+        setLoading(false);
+
+    }, [urlPath]);
 
     const handleSubmit = async () => {
 
@@ -72,7 +73,7 @@ function CreateEventModal({ visible }: { visible: boolean }) {
             });
 
             showAlert(AlertTypes.SUCCESS, 'Event created successfully!');
-            closeModal();
+            navigate(-1);
         } catch (e: unknown) {
             if (e instanceof Error) {
                 showAlert(AlertTypes.ERROR, e.message);
@@ -85,7 +86,7 @@ function CreateEventModal({ visible }: { visible: boolean }) {
     };
 
     return (
-        <Modal title="Create New Event" width="500px" visibility={visible} icon={ModalIcons.CREATE_EVENT}>
+        <Modal title="Create New Event" width="500px" icon={ModalIcons.CREATE_EVENT}>
             <form
                 className="flex flex-col gap-4"
                 onSubmit={(e) => {

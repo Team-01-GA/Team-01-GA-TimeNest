@@ -1,7 +1,7 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import EventList from './EventList';
 import ContactList from './ContactList';
-import ModalContext from '../../providers/ModalContext';
+// import ModalContext from '../../providers/ModalContext';
 
 
 type SidebarProps = {
@@ -10,19 +10,19 @@ type SidebarProps = {
 
 function Sidebar({ selectedDate }: SidebarProps) {
     const [activeTab, setActiveTab] = useState<'day' | 'contacts'>('day');
-    const { modalKey } = useContext(ModalContext);
 
-    const isAnyModalOpen = modalKey !== null;
+    // const isAnyModalOpen = modalKey !== null;
 
     return (
-        // <div className="flex flex-col h-full">
-        <div
+        <div className="flex flex-col h-full relative">
+
+        {/* <div
             className={`flex flex-col h-full transition-all duration-300 ${isAnyModalOpen ? 'opacity-40 pointer-events-none blur-sm' : ''
                 }`}
-        >
+        > */}
 
             {/* Sticky Top Controls */}
-            <div className="p-2 border-b border-base-300 shrink-0 sticky top-0 bg-base-300 z-10">
+            <div className="p-2 border-b border-base-300 absolute top-0 left-0 w-full bg-base-300">
                 <div className="flex justify-center mb-2">
                     <button
                         className={`btn btn-xs rounded-r-none ${activeTab === 'day' ? 'btn-primary' : 'btn-outline'}`}
@@ -48,7 +48,9 @@ function Sidebar({ selectedDate }: SidebarProps) {
             </div>
 
             {/* Scrollable View */}
-            {activeTab === 'day' ? <EventList /> : <ContactList />}
+            <div className='w-full h-auto mt-20 overflow-y-auto'>
+                {activeTab === 'day' ? <EventList /> : <ContactList />}
+            </div>
         </div>
     );
 }

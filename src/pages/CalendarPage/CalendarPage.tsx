@@ -1,13 +1,10 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import MonthView from '../../components/calendar/MonthView';
 import Sidebar from '../../components/calendar/Sidebar';
-import CreateEventModal from '../../components/EventModal/CreateEventModal';
-import { ModalKeys } from '../../constants/modal.constants';
-import ModalContext from '../../providers/ModalContext';
+import AnimatedOutlet from '../../components/AnimatedOutlet';
 
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const { modalKey } = useContext(ModalContext);
 
   return (
     <>
@@ -30,8 +27,7 @@ function CalendarPage() {
 
         </div>
       </div>
-
-      <CreateEventModal visible={modalKey === ModalKeys.CREATE_EVENT} />
+      <AnimatedOutlet />
     </>
   );
 }
