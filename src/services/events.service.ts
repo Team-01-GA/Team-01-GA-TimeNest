@@ -1,4 +1,4 @@
-import { ref, push, update } from 'firebase/database';
+import { ref, push, update, get } from 'firebase/database';
 import { db } from '../config/firebase-config';
 
 export interface EventData {
@@ -17,7 +17,7 @@ export interface EventData {
 
 export const addEvent = async (event: EventData) => {
     try {
-        
+
         // Validate title
         if (!event.title || event.title.length < 3 || event.title.length > 30) {
             throw new Error('Title must be between 3 and 30 characters.');
@@ -32,7 +32,7 @@ export const addEvent = async (event: EventData) => {
         if (!event.createdBy) {
             throw new Error('Missing creator handle.');
         }
-        
+
         // Validate start and end dates
         if (!event.start || !event.end) {
             throw new Error('Start and end dates are required.');
@@ -47,7 +47,7 @@ export const addEvent = async (event: EventData) => {
         const eventId = result.key;
 
         if (!eventId) throw new Error('Event ID not generated');
-        
+
         try {
             await update(ref(db), {
                 [`events/${eventId}/id`]: eventId,
@@ -61,5 +61,54 @@ export const addEvent = async (event: EventData) => {
     } catch (error) {
         console.error('Error in addEvent:', error);
         throw error;
+    }
+};
+
+
+export const getAllEvents = async (): Promise<EventData[]> => {
+    try {
+        const snapshot = await get(ref(db, 'events'));
+        if (!snapshot.exists()) return [];
+
+        return Object.values(snapshot.val()) as EventData[];
+    } catch (error) {
+        console.error('Error fetching all events:', error);
+        return [];
+    }
+
+};
+
+
+export const getEventsForDate = async (targetDate: Date): Promise<EventData[]> => {
+    try {
+        const allEvents = await getAllEvents();
+        return allEvents.filter((event) => {
+            const start = new Date(event.start);
+            const end = new Date(event.end);
+
+            const isSameDay = (date: Date) =>
+                date.getDate() === targetDate.getDate() &&
+                date.getMonth() === targetDate.getMonth() &&
+                date.getFullYear() === targetDate.getFullYear();
+
+            if (isSameDay(start)) return true;
+
+            // Multi-day events
+            if (start <= targetDate && end >= targetDate) return true;
+
+            // Recurring logic
+            if (event.recurrence && event.recurrence.length > 0) {
+                const dayName = targetDate.toLocaleString('en-US', { weekday: 'long' });
+
+                if (targetDate >= start) {
+                    return event.recurrence.includes(dayName);
+                }
+            }
+
+            return false;
+        });
+    } catch (error) {
+        console.error('Error filtering events by date:', error);
+        return [];
     }
 };

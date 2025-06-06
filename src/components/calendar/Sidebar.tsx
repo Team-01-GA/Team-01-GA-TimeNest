@@ -49,7 +49,7 @@ function Sidebar({ selectedDate }: SidebarProps) {
 
             {/* Scrollable View */}
             <div className='w-full h-auto mt-20 overflow-y-auto'>
-                {activeTab === 'day' ? <EventList /> : <ContactList />}
+                {activeTab === 'day' ? <EventList selectedDate={selectedDate} /> : <ContactList />}
             </div>
         </div>
     );
