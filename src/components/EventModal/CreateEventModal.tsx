@@ -63,6 +63,21 @@ function CreateEventModal() {
             return;
         }
 
+        if (recurrence.length > 0) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            const sameDay =
+                startDate.getFullYear() === endDate.getFullYear() &&
+                startDate.getMonth() === endDate.getMonth() &&
+                startDate.getDate() === endDate.getDate();
+
+            if (!sameDay) {
+                showAlert(AlertTypes.ERROR, 'Recurring events must start and end on the same day.');
+                return;
+            }
+        }
+
         try {
             setLoading(true);
             await addEvent({
