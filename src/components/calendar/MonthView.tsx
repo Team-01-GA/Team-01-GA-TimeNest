@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
 import { ModalIcons } from '../../constants/modal.constants';
 import { useNavigate } from 'react-router-dom';
+import { getAllEvents, type EventData } from '../../services/events.service';
 
 type MonthViewProps = {
     selectedDate: Date;
@@ -12,8 +13,21 @@ type MonthViewProps = {
 
 function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
     const [visibleDate, setVisibleDate] = useState(new Date());
-    
+    const [allEvents, setAllEvents] = useState<EventData[]>([]);
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        async function loadEvents() {
+            try {
+                const events = await getAllEvents();
+                setAllEvents(events);
+            } catch (err) {
+                console.error('Failed to fetch events for calendar grid', err);
+            }
+        }
+        loadEvents();
+    }, []);
 
     function goToPreviousMonth() {
         const prev = new Date(visibleDate);
@@ -89,6 +103,7 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
                         isCurrentMonth={date.getMonth() === currentMonth}
                         onClick={() => setSelectedDate(date)}
                         isSelected={isSameCalendarDay(date, selectedDate)}
+                        allEvents={allEvents}
                     />
                 ))}
             </div>
