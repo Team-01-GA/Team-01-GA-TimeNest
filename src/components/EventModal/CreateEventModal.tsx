@@ -1,10 +1,10 @@
 import { useContext, useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
-import AppContext from '../../providers/AppContext';
+import AppContext from '../../providers/UserContext';
 import AlertContext from '../../providers/AlertContext';
 import { addEvent } from '../../services/events.service';
 import { AlertTypes } from '../../constants/alert.constants';
-import { ModalIcons } from '../../constants/modal.constants';
+import { Icons } from '../../constants/icon.constants';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 function CreateEventModal() {
@@ -107,7 +107,7 @@ function CreateEventModal() {
     };
 
     return (
-        <Modal title="Create New Event" width="500px" icon={ModalIcons.CREATE_EVENT}>
+        <Modal title="Create New Event" width="500px" icon={Icons.MODAL_CREATE_EVENT}>
             <form
                 className="flex flex-col gap-4"
                 onSubmit={(e) => {

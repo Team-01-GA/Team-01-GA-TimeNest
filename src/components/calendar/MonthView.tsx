@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
-import { ModalIcons } from '../../constants/modal.constants';
+import { Icons } from '../../constants/icon.constants';
 import { useNavigate } from 'react-router-dom';
 import { getAllEvents, type EventData } from '../../services/events.service';
 
@@ -81,7 +81,7 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
                     className="btn btn-sm btn-accent flex items-center gap-2"
                     onClick={() => navigate('/app/event/create')}
                 >
-                    <i className={ModalIcons.CREATE_EVENT}></i>
+                    <i className={Icons.MODAL_CREATE_EVENT}></i>
                     Create Event
                 </button>
             </div>

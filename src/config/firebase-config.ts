@@ -8,7 +8,7 @@ const firebaseConfig = {
     apiKey: API_KEY,
     authDomain: 'team-01-ga-timenest.firebaseapp.com',
     projectId: 'team-01-ga-timenest',
-    storageBucket: 'team-01-ga-timenest.firebasestorage.app',
+    storageBucket: 'team-01-ga-timenest.appspot.com',
     messagingSenderId: '424665628247',
     appId: '1:424665628247:web:c11b352fa2ee2af6c1ad12',
     databaseURL: 'https://team-01-ga-timenest-default-rtdb.europe-west1.firebasedatabase.app/',

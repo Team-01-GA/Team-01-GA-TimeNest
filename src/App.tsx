@@ -4,8 +4,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import type { User } from 'firebase/auth';
 import { DataSnapshot } from 'firebase/database';
 import { auth } from './config/firebase-config';
-import AppContext from './providers/AppContext';
-import type { AppContextType, UserData } from './providers/AppContext';
+import AppContext from './providers/UserContext';
+import type { UserContextType, UserData } from './providers/UserContext';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { getUserData } from './services/users.service';
 import HomePage from './pages/HomePage/HomePage';
@@ -18,14 +18,27 @@ import Loader from './components/Loader/Loader';
 import AuthModal from './components/AuthModal/AuthModal';
 import { AnimatePresence } from 'framer-motion';
 import CreateEventModal from './components/EventModal/CreateEventModal';
+import { useTheme } from './utils/useTheme';
+import { CalendarTypes } from './constants/calendar.constants';
+import Header from './components/Header/Header';
+import AnimatedPage from './components/AnimatedPage';
+import ProfileModal from './components/ProfileModal/ProfileModal';
 
 function App() {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null | undefined>(undefined);
     const [userData, setUserData] = useState<UserData | null>(null);
-    const [userLoading, setUserLoading] = useState<boolean>(false);
+
+    const [firebaseUser, loading, error] = useAuthState(auth);
+
+    const [calendarType, setCalendarType] = useState<CalendarTypes>(() => {
+        const stored = localStorage.getItem('calendarType');
+        return stored === null ? CalendarTypes.MONTH : JSON.parse(stored);
+    });
 
     const [alertType, setAlertType] = useState<AlertTypes | null>(null);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+    const { prefersDark } = useTheme();
 
     const showAlert = async (alertTypeParam: AlertTypes, alertMessageParam: string | null) => {
         setAlertMessage(alertMessageParam);
@@ -41,14 +54,20 @@ function App() {
         showAlert,
     };
 
-    const [firebaseUser, loading, error] = useAuthState(auth);
+    const UserContextValue: UserContextType = {
+        user,
+        setUser,
+        userData,
+        setUserData,
+    };
 
     useEffect(() => {
-        setUserLoading(true);
-        if (!firebaseUser) {
+        if (firebaseUser === undefined) {
+            return;
+        }
+        if (firebaseUser === null) {
             setUser(null);
             setUserData(null);
-            setUserLoading(false);
             return;
         }
 
@@ -73,20 +92,29 @@ function App() {
             .catch((err) => {
                 console.error(err.message);
             })
-            .finally(() => {
-                setUserLoading(false);
-            });
-        
     }, [firebaseUser]);
 
-    const contextValue: AppContextType = {
-        user,
-        setUser,
-        userData,
-        setUserData,
-    };
+    useEffect(() => {
+        localStorage.setItem('calendarType', JSON.stringify(calendarType));
+    }, [calendarType])
 
-    if (loading || userLoading) return <Loader />;
+    useEffect(() => {
+        const root = document.documentElement;
+        const resolvedTheme = prefersDark === false
+            ? 'bumblebee'
+            : prefersDark === true
+                ? 'halloween'
+                : window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'halloween'
+                    : 'bumblebee';
+        root.setAttribute('data-theme', resolvedTheme);
+    }, [prefersDark]);
+
+    if (loading || user === undefined) return (
+        <AnimatePresence mode='wait'>
+            <Loader key='loader' />
+        </AnimatePresence>
+    );
 
     if (error) {
         showAlert(AlertTypes.ERROR, error.message);
@@ -94,17 +122,18 @@ function App() {
     }
 
     return (
-        <AppContext.Provider value={contextValue}>
+        <AppContext.Provider value={UserContextValue}>
             <AlertContext.Provider value={AlertContextValue}>
                 <Alert />
                 <BrowserRouter>
                     <div
                         id="main-app"
-                        className="flex flex-col w-full h-[100vh] pt-14 bg-base-200"
+                        className="flex flex-col w-full justify-center h-[100vh] pt-24 bg-base-200 overflow-hidden"
                     >
+                        {firebaseUser && <Header calendarType={calendarType} setCalendarType={setCalendarType}/>}
                         <AnimatePresence mode='wait'>
                             <Routes>
-                                {!user ? (
+                                {firebaseUser === null ? (
                                     <>
                                         <Route path="/welcome" element={<HomePage />}>
                                             <Route path='/welcome/auth' element={<AuthModal/>} />
@@ -113,8 +142,13 @@ function App() {
                                     </>
                                 ) : (
                                     <>
-                                        <Route path="/app" element={<CalendarPage />}>
+                                        <Route path="/app" element={
+                                            <AnimatedPage>
+                                                <CalendarPage calendarType={calendarType} />
+                                            </AnimatedPage>
+                                        }>
                                             <Route path='/app/event/create' element={<CreateEventModal />}/>
+                                            <Route path='/app/account/:userHandle' element={<ProfileModal />}/>
                                         </Route>
                                         <Route path="*" element={<Navigate to="/app" replace />} />
                                     </>

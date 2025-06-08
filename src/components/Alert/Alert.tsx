@@ -28,7 +28,7 @@ function Alert() {
     };
 
     return (
-        <div className={`${alertType} alert-vertical fixed max-w-2xl z-20 bottom-0 text-2xl text-start`} style={alertStyle}>
+        <div className={`${alertType} alert-vertical fixed max-w-2xl z-50 bottom-0 text-2xl text-start`} style={alertStyle}>
             {icon && <i className={icon}></i>}
             <span>{alertMessage}</span>
         </div>

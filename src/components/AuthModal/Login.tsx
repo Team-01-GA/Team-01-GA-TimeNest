@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import AppContext from '../../providers/AppContext';
+import UserContext from '../../providers/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/auth.service';
 import AlertContext from '../../providers/AlertContext';
@@ -15,7 +15,7 @@ function Login() {
         email: '',
         password: '',
     });
-    const { setUser } = useContext(AppContext);
+    const { setUser } = useContext(UserContext);
     const { showAlert } = useContext(AlertContext);
 
     const navigate = useNavigate();
@@ -42,7 +42,7 @@ function Login() {
                 setUser(credential.user);
             })
             .then(() => {
-                navigate('/calendar');
+                navigate('/app');
             })
             .catch((e: unknown) => {
                 if (e instanceof Error) {

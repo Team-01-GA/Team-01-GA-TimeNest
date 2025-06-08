@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import AppContext from '../../providers/AppContext';
+import UserContext from '../../providers/UserContext';
 import { createUserObject, getUserByEmail, getUserByHandle } from '../../services/users.service';
 import { registerUser } from '../../services/auth.service';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ function Register() {
         email: '',
         password: '',
     });
-    const { setUser } = useContext(AppContext);
+    const { setUser } = useContext(UserContext);
     const { showAlert } = useContext(AlertContext);
 
     const navigate = useNavigate();
@@ -86,7 +86,7 @@ function Register() {
 
             setUser(credential.user);
 
-            navigate('/calendar');
+            navigate('/app');
         }
         catch (e: unknown) {
             if (e instanceof Error) {
