@@ -15,6 +15,10 @@ export interface EventData {
     recurrence?: string[];
 }
 
+function isOverlapping(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
+    return aStart < bEnd && aEnd > bStart;
+}
+
 export const addEvent = async (event: EventData) => {
     try {
 
@@ -36,6 +40,39 @@ export const addEvent = async (event: EventData) => {
         // Validate start and end dates
         if (!event.start || !event.end) {
             throw new Error('Start and end dates are required.');
+        }
+
+        // disable event creation for past dates
+        const now = new Date();
+        const startDate = new Date(event.start);
+        const endDate = new Date(event.end);
+
+        if (startDate < now) {
+            throw new Error('Cannot create events in the past.');
+        }
+
+        if (endDate <= startDate) {
+            throw new Error('End time must be after start time.');
+        }
+
+        // Prevent overlapping
+        const allEvents = await getAllEvents();
+
+        const overlaps = allEvents.some(existing => {
+            const existingStart = new Date(existing.start);
+            const existingEnd = new Date(existing.end);
+
+            // Skip same event if editing (optional logic)
+            if (existing.id === event.id) return false;
+
+            // Skip recurring events (optional)
+            if (existing.recurrence?.length) return false;
+
+            return isOverlapping(startDate, endDate, existingStart, existingEnd);
+        });
+
+        if (overlaps) {
+            throw new Error('This event overlaps with an existing one.');
         }
 
         // Make sure creator is in participants
