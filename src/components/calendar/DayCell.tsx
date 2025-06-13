@@ -30,9 +30,17 @@ function DayCell({ date, isCurrentMonth, isToday, isSelected, onClick, allEvents
         if (isSameDay(start)) return true;
         if (start <= date && end >= date) return true;
 
-        if (event.recurrence && event.recurrence.length > 0) {
+        if (event.recurrence && event.recurrence.length > 0 && start <= date) {
             const dayName = date.toLocaleString('en-US', { weekday: 'long' });
-            return event.recurrence.includes(dayName) && start <= date;
+
+            if (event.recurrence.includes(dayName)) {
+                return true;
+            }
+
+            if (event.recurrence.includes('Monthly')) {
+                const recurringDay = new Date(event.start).getDate();
+                return date.getDate() === recurringDay;
+            }
         }
 
         return false;

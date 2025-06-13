@@ -57,18 +57,66 @@ export const addEvent = async (event: EventData) => {
 
         // Prevent overlapping
         const allEvents = await getAllEvents();
+        
+        // const overlaps = allEvents.some(existing => {
+        //     const existingStart = new Date(existing.start);
+        //     const existingEnd = new Date(existing.end);
 
+        //     // Skip same event if editing (optional logic)
+        //     if (existing.id === event.id) return false;
+
+        //     // Skip recurring events (optional)
+        //     if (existing.recurrence?.length) return false;
+
+        //     return isOverlapping(startDate, endDate, existingStart, existingEnd);
+        // });
+
+        // simulate overlaps for recurring events
         const overlaps = allEvents.some(existing => {
+            if (existing.id === event.id) return false;
+
+            const newStart = new Date(event.start);
+            const newEnd = new Date(event.end);
+
             const existingStart = new Date(existing.start);
             const existingEnd = new Date(existing.end);
 
-            // Skip same event if editing (optional logic)
-            if (existing.id === event.id) return false;
+            // If existing is not recurring, compare directly
+            if (!existing.recurrence || existing.recurrence.length === 0) {
+                return isOverlapping(newStart, newEnd, existingStart, existingEnd);
+            }
 
-            // Skip recurring events (optional)
-            if (existing.recurrence?.length) return false;
+            // If existing is recurring weekly (e.g., "Monday")
+            const weekday = newStart.toLocaleString('en-US', { weekday: 'long' });
 
-            return isOverlapping(startDate, endDate, existingStart, existingEnd);
+            if (existing.recurrence.includes(weekday)) {
+                // Generate the recurring event's instance *on this day*
+                const recurringStart = new Date(newStart);
+                recurringStart.setHours(existingStart.getHours(), existingStart.getMinutes());
+
+                const recurringEnd = new Date(newStart);
+                recurringEnd.setHours(existingEnd.getHours(), existingEnd.getMinutes());
+
+                return isOverlapping(newStart, newEnd, recurringStart, recurringEnd);
+            }
+
+            // Monthly recurrence check
+            if (existing.recurrence.includes('Monthly')) {
+                const targetDay = newStart.getDate();
+                const recurringDay = existingStart.getDate();
+
+                if (targetDay === recurringDay) {
+                    const recurringStart = new Date(newStart);
+                    recurringStart.setHours(existingStart.getHours(), existingStart.getMinutes());
+
+                    const recurringEnd = new Date(newStart);
+                    recurringEnd.setHours(existingEnd.getHours(), existingEnd.getMinutes());
+
+                    return isOverlapping(newStart, newEnd, recurringStart, recurringEnd);
+                }
+            }
+
+            return false;
         });
 
         if (overlaps) {
@@ -134,11 +182,17 @@ export const getEventsForDate = async (targetDate: Date): Promise<EventData[]> =
             if (start <= targetDate && end >= targetDate) return true;
 
             // Recurring logic
-            if (event.recurrence && event.recurrence.length > 0) {
-                const dayName = targetDate.toLocaleString('en-US', { weekday: 'long' });
+            if (event.recurrence && event.recurrence.length > 0 && targetDate >= start) {
+                const startDay = new Date(event.start).getDate();
+                const targetDay = targetDate.getDate();
 
-                if (targetDate >= start) {
-                    return event.recurrence.includes(dayName);
+                if (event.recurrence.includes('Monthly')) {
+                    return targetDay === startDay;
+                }
+
+                const dayName = targetDate.toLocaleString('en-US', { weekday: 'long' });
+                if (event.recurrence.includes(dayName)) {
+                    return true;
                 }
             }
 

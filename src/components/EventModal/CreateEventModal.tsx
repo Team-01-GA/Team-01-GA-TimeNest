@@ -94,7 +94,8 @@ function CreateEventModal() {
             });
 
             showAlert(AlertTypes.SUCCESS, 'Event created successfully!');
-            navigate(-1);
+            // navigate(-1);
+            navigate('/app/calendar', { replace: true });
         } catch (e: unknown) {
             if (e instanceof Error) {
                 showAlert(AlertTypes.ERROR, e.message);
@@ -157,12 +158,30 @@ function CreateEventModal() {
                                     className="checkbox checkbox-sm"
                                     checked={recurrence.includes(day)}
                                     onChange={() => toggleDay(day)}
+                                    disabled={recurrence.includes('Monthly')}
                                 />
                                 <span className="text-sm">{day}</span>
                             </label>
                         ))}
                     </div>
+
+                    <label className="flex items-center gap-2 mt-2">
+                        <input
+                            type="checkbox"
+                            className="checkbox checkbox-sm"
+                            checked={recurrence.includes('Monthly')}
+                            onChange={() => {
+                                setRecurrence((prev) =>
+                                    prev.includes('Monthly')
+                                        ? prev.filter((d) => d !== 'Monthly')
+                                        : ['Monthly'] // override all weekday selections
+                                );
+                            }}
+                        />
+                        <span className="text-sm">Monthly (same day each month)</span>
+                    </label>
                 </div>
+
                 <label className="label cursor-pointer">
                     <span className="label-text">Public</span>
                     <input
