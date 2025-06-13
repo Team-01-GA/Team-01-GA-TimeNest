@@ -12,6 +12,7 @@ type registerFields = {
     handle: string;
     email: string;
     password: string;
+    number: string;
 };
 
 const NAME_MIN_LENGTH: number = 1;
@@ -23,6 +24,9 @@ const HANDLE_MAX_LENGTH: number = 30;
 const PASS_MIN_LENGTH: number = 8;
 const PASS_MAX_LENGTH: number = 30;
 
+const NUMBER_MIN_LENGTH: number = 1;
+const NUMBER_MAX_LENGTH: number = 10;
+
 function Register() {
 
     const [ fields, setFields ] = useState<registerFields>({
@@ -31,6 +35,7 @@ function Register() {
         handle: '',
         email: '',
         password: '',
+        number: ''
     });
     const { setUser } = useContext(UserContext);
     const { showAlert } = useContext(AlertContext);
@@ -53,12 +58,16 @@ function Register() {
             showAlert(AlertTypes.WARNING, 'Last name must be between 1 and 30 characters, without spaces or digits.');
             return;
         }
-        if (!fields.handle || fields.handle.includes(' ') || fields.handle.length < HANDLE_MIN_LENGTH || fields.handle.length > HANDLE_MAX_LENGTH) {
+        if (!fields.handle || fields.handle.includes(' ') || fields.handle.length < HANDLE_MIN_LENGTH || fields.handle.length > HANDLE_MAX_LENGTH || fields.handle === '_init') {
             showAlert(AlertTypes.WARNING, 'Username must be between 3 and 30 characters, without spaces.');
             return;
         }
         if (!fields.email || fields.email.includes(' ') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
             showAlert(AlertTypes.WARNING, 'Please enter a valid email address.');
+            return;
+        }
+        if (!fields.number || fields.number.includes(' ') || fields.number.length < NUMBER_MIN_LENGTH || fields.number.length > NUMBER_MAX_LENGTH) {
+            showAlert(AlertTypes.WARNING, 'Please enter a valid phone number.');
             return;
         }
         if (!fields.password || fields.password.includes(' ') || !isValidPassword(fields.password)) {
@@ -70,19 +79,19 @@ function Register() {
         const normalisedHandle = fields.handle.toLowerCase();
 
         try {
-            let snapshot = await getUserByHandle(normalisedHandle);
-            if (snapshot.exists()) {
+            const handleSnapshot = await getUserByHandle(normalisedHandle);
+            if (handleSnapshot) {
                 throw new Error(`Username ${normalisedHandle} has already been taken.`);
             }
 
-            snapshot = await getUserByEmail(normalisedEmail);
-            if (snapshot.exists()) {
+            const emailSnapshot = await getUserByEmail(normalisedEmail);
+            if (emailSnapshot) {
                 throw new Error(`Email ${normalisedEmail} has already been taken.`);
             }
 
             const credential = await registerUser(normalisedEmail, fields.password);
 
-            await createUserObject(fields.firstName, fields.lastName, normalisedHandle, credential.user.uid, credential.user.email);
+            await createUserObject(fields.firstName, fields.lastName, normalisedHandle, credential.user.uid, credential.user.email, fields.number);
 
             setUser(credential.user);
 
@@ -127,6 +136,10 @@ function Register() {
                 <label className="floating-label">
                     <span>Email</span>
                     <input className="input input-lg w-full" name='email' placeholder='johndoe@timenest.com' type="email" autoComplete='email' value={fields.email} onChange={e => saveInputs('email', e.target.value)}/>
+                </label>
+                <label className="floating-label">
+                    <span>Phone number</span>
+                    <input className="input input-lg w-full" name='tel' placeholder='0888888888' type="tel" autoComplete='tel' value={fields.number} onChange={e => saveInputs('number', e.target.value)}/>
                 </label>
                 <label className="floating-label">
                     <span>Password</span>

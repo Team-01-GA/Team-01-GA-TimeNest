@@ -104,7 +104,7 @@ function ProfileModal() {
                 {!loading
                     ? userHandle === userData?.handle
                         ? <MyAccountDetails events={userEvents} />
-                        : <OtherAccountsDetails userObject={otherUser} events={userEvents}/>
+                        : otherUser && <OtherAccountsDetails userObject={otherUser} events={userEvents}/>
                     : <div className="flex justify-center items-center h-32">
                         <div className="loader"></div>
                     </div>

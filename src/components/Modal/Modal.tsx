@@ -26,20 +26,20 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal({ title, wid
 
     return (
         <motion.div
-            className="z-50"
+            className="bg-[rgba(109,109,109,0.44)] fixed top-0 left-0 w-[100vw] h-[100vh] z-40 flex flex-col items-center justify-center backdrop-blur-xs"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
         >
-            <div onClick={closeModal} className='bg-[rgba(109,109,109,0.44)] fixed top-0 left-0 w-[100vw] h-[100vh] z-40 flex flex-col items-center justify-center backdrop-blur-xs'>
+            <div onClick={closeModal} className='fixed top-0 left-0 w-[100vw] h-[100vh] z-40 flex flex-col items-center justify-center'>
                 <div
                     onClick={(e) => e.stopPropagation()}
                     ref={ref}
                     className='relative flex flex-col p-4 max-h-[60%] bg-base-100 rounded-box shadow-2xl shadow-base-300'
                     style={{ width }}
                 >
-                    <div className="absolute z-10 flex top-0 left-0 w-[calc(100%-2rem)] mr-8 h-20 bg-base-100/60 backdrop-blur-[3px] rounded-2xl">
+                    <div className="absolute z-[4] flex top-0 left-0 w-[calc(100%-2rem)] mr-8 h-20 bg-base-100/60 backdrop-blur-[3px] rounded-2xl">
                         <AnimatePresence mode="wait" initial={false}>
                             <motion.h3
                                 key={title}

@@ -54,15 +54,20 @@ export const createUserObject = async (
     lastName: string,
     handle: string,
     uid: string,
-    email: string | null
+    email: string | null,
+    phoneNumber: string,
 ) => {
     try {
+        if (handle === '_init') {
+            throw new Error('Handle init error.');
+        }
         return set(ref(db, `users/${handle}`), {
             uid,
             handle,
             firstName,
             lastName,
             email,
+            phoneNumber,
             isAdmin: false,
             isBlocked: false,
             prefersFullName: false,
@@ -103,22 +108,122 @@ export const getProfileImageUrl = async (
     }
 };
 
-export const toggleUserToContacts = async (loggedInUser: UserData, handle: string): Promise<boolean | undefined> => {
-    let hasContact: boolean | undefined;
+export const addUserToContactList = async (loggedInUser: UserData, handle: string, contactList: string): Promise<void> => {
+    try {
+        await update(ref(db), {[`/users/${loggedInUser.handle}/contacts/${contactList}/${handle}`]: true});
+    }
+    catch (error) {
+        console.error(`Failed adding user "${handle}" to contact list "${contactList}": `, error);
+    }
+};
+
+export const removeUserFromContactList = async (loggedInUser: UserData, handle: string, contactList: string): Promise<void> => {
+    try {
+        await update(ref(db), {[`/users/${loggedInUser.handle}/contacts/${contactList}/${handle}`]: null});
+    }
+    catch (error) {
+        console.error(`Failed removing user "${handle}" from contact list "${contactList}": `, error);
+    }
+};
+
+export const removeUserFromAllContactLists = async (loggedInUser: UserData, handle: string): Promise<void> => {
     try {
         const userObject = await getUserByHandle(loggedInUser.handle);
-        hasContact = userObject.contacts && Object.keys(userObject.contacts).includes(handle);
+        if (userObject.contacts) {
+            const updateObj: Record<string, null> = {};
 
-        if (hasContact) {
-            await update(ref(db), {[`/users/${loggedInUser.handle}/contacts/${handle}`]: null});
-            return false;
+            for (const [listName, contactsObj] of Object.entries(userObject.contacts)) {
+                if (contactsObj && contactsObj[handle] !== undefined) {
+                    updateObj[`/users/${loggedInUser.handle}/contacts/${listName}/${handle}`] = null;
+                }
+            }
+
+            if (Object.keys(updateObj).length > 0) {
+                await update(ref(db), updateObj);
+            }
         } else {
-            await update(ref(db), {[`/users/${loggedInUser.handle}/contacts/${handle}`]: true});
+            throw new Error(`Cannot remove contact as current user ${loggedInUser.handle} doesn't have any contact lists.`);
+        }
+    } catch (error) {
+        console.error(`Failed removing user "${handle}" from all contact lists: `, error);
+    }
+};
+
+export const getContactsAsContactListMaps = async (loggedInUser: UserData): Promise<{ listName: string; handlesMap: Record<string, boolean | null> }[]> => {
+    try {
+        const userObject = await getUserByHandle(loggedInUser.handle);
+
+        if (!userObject.contacts) {
+            return [];
+        }
+
+        return Object.entries(userObject.contacts).map(([listName, list]) => ({
+            listName,
+            handlesMap: list
+                ? Object.fromEntries(
+                    Object.entries(list).filter(([handle]) => handle !== '_init')
+                  )
+                : {},
+        }));
+    } catch (error) {
+        console.error(`Failed to get contact lists for user "${loggedInUser.handle}":`, error);
+        return [];
+    }
+};
+
+export const getAllContacts = async (handle: string): Promise<Set<string | never>> => {
+    try {
+        const userObject = await getUserByHandle(handle);
+        let handles: string[] = [];
+
+        if (userObject.contacts) {
+            handles = Object.entries(userObject.contacts as Record<string, Record<string, true>>)
+                .flatMap(([, list]) =>
+                    Object.entries(list)
+                        .filter(([contactHandle]) => contactHandle !== '_init')
+                        .map(([contactHandle]) => contactHandle)
+                );
+        } else {
+            return new Set();
+        }
+
+        return new Set(handles);
+    } catch (error) {
+        console.error(`Failed getting all contacts for user "${handle}":`, error);
+        return new Set();
+    }
+};
+
+export const checkUserInContacts = async (loggedInUser: UserData, handle: string): Promise<boolean> => {
+    try {
+        const contacts = (await getAllContacts(loggedInUser.handle));
+
+        if (contacts.size && contacts.has(handle)) {
+            return true; 
+        }
+
+        return false;
+    } catch (error) {
+        console.error(`Failed getting contact status for user "${handle}": `, error);
+        return false;
+    }
+};
+
+export const addNewContactList = async (loggedInUser: UserData, listName: string) => {
+    try {
+        const userObject = await getUserByHandle(loggedInUser.handle);
+        const normalizedListName = listName.trim();
+        if (!userObject.contacts || !userObject.contacts[normalizedListName]) {
+            await update(ref(db), {
+                [`/users/${loggedInUser.handle}/contacts/${normalizedListName}/_init`]: true
+            });
             return true;
+        } else {
+            return false;
         }
     }
     catch (error) {
-        console.error('Failed setting friend status: ', error);
-        return hasContact;
+        console.error(`Failed adding new contact list for current user "${loggedInUser.handle}": `, error);
+        return null;
     }
 }

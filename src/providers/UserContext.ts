@@ -6,8 +6,9 @@ export interface UserData {
     lastName?: string;
     email?: string;
     handle: string;
+    phoneNumber: string;
     profileImg?: string;
-    contacts?: { [key: string]: true | null };
+    contacts?: { [key: string]: {[key: string]: true | null} | null };
     sharesContacts?: boolean;
     bio?: string;
     createdOn: string;
