@@ -4,6 +4,7 @@ import Sidebar from '../../components/calendar/Sidebar';
 import AnimatedOutlet from '../../components/AnimatedOutlet';
 import { CalendarTypes } from '../../constants/calendar.constants';
 import AnimatedPage from '../../components/AnimatedPage';
+import WeekView from '../../components/calendar/WeekView';
 
 type CalendarProps = {
     calendarType: CalendarTypes;
@@ -21,6 +22,17 @@ function CalendarPage({ calendarType }: CalendarProps) {
                         <AnimatedPage>
                             <div className="flex-1 min-w-0 h-full overflow-hidden">
                                 <MonthView
+                                    selectedDate={selectedDate}
+                                    setSelectedDate={setSelectedDate}
+                                />
+                            </div>
+                        </AnimatedPage>
+                    )}
+
+                    {calendarType === CalendarTypes.WEEK && (
+                        <AnimatedPage>
+                            <div className="flex-1 min-w-0 h-full overflow-hidden">
+                                <WeekView
                                     selectedDate={selectedDate}
                                     setSelectedDate={setSelectedDate}
                                 />

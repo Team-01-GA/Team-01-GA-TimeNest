@@ -110,52 +110,90 @@ export const addEvent = async (event: EventData) => {
                 const existingStart = new Date(existing.start);
                 const existingEnd = new Date(existing.end);
                 
-                // Handle existing multi-day events differently
-                if (existing.isMultiDay) {
-                    // For multi-day events, we check if the time slot overlaps on this specific day
-                    const existingDateStart = new Date(date);
-                    existingDateStart.setHours(existingStart.getHours(), existingStart.getMinutes(), 0, 0);
-                    
-                    const existingDateEnd = new Date(date);
-                    existingDateEnd.setHours(existingEnd.getHours(), existingEnd.getMinutes(), 0, 0);
-                    
-                    return isOverlapping(newStart, newEnd, existingDateStart, existingDateEnd);
-                }
-
-                // Standard non-recurring event check
-                if (!existing.recurrence || existing.recurrence.length === 0) {
-                    // First check if this is the same day
-                    const isSameDay = date.getDate() === existingStart.getDate() &&
-                                      date.getMonth() === existingStart.getMonth() &&
-                                      date.getFullYear() === existingStart.getFullYear();
-                    
-                    if (!isSameDay) return false;
-                    return isOverlapping(newStart, newEnd, existingStart, existingEnd);
-                }
-
-                // Check if this is a recurring event and the date is after the event's start
-                if (existing.recurrence && existing.recurrence.length > 0 && date >= existingStart) {
-                    // Check if the recurring event would occur on this date
-                    const isRecurringDay = 
-                        // Weekly recurrence check - check by day of week
-                        (existing.recurrence.includes(date.toLocaleString('en-US', { weekday: 'long' }))) ||
-                        // Monthly recurrence check - check if same day of month
-                        (existing.recurrence.includes('Monthly') && date.getDate() === existingStart.getDate());
-                    
-                    if (isRecurringDay) {
-                        // Create time slots for this recurring instance
-                        const recurringStart = new Date(date);
-                        recurringStart.setHours(existingStart.getHours(), existingStart.getMinutes(), 0, 0);
-    
-                        const recurringEnd = new Date(date);
-                        recurringEnd.setHours(existingEnd.getHours(), existingEnd.getMinutes(), 0, 0);
-    
-                        // Check for time slot overlap
-                        return isOverlapping(newStart, newEnd, recurringStart, recurringEnd);
+                // Check if existing event occurs on this specific date
+                const eventOccursOnDate = (() => {
+                    // Same day as original event
+                    if (date.getDate() === existingStart.getDate() &&
+                        date.getMonth() === existingStart.getMonth() &&
+                        date.getFullYear() === existingStart.getFullYear()) {
+                        return true;
                     }
+                    
+                    // Multi-day event that spans this date
+                    if (existing.isMultiDay && existingStart <= date && existingEnd >= date) {
+                        return true;
+                    }
+                    
+                    // Traditional multi-day spanning check
+                    if (!existing.isMultiDay && existingStart <= date && existingEnd >= date) {
+                        return true;
+                    }
+                    
+                    // Recurring events only if the date is on or after the original event
+                    if (existing.recurrence && existing.recurrence.length > 0 && date >= existingStart) {
+                        const dayName = date.toLocaleString('en-US', { weekday: 'long' });
+                        
+                        // Weekly recurrence
+                        if (existing.recurrence.includes(dayName)) {
+                            return true;
+                        }
+                        
+                        // Monthly recurrence
+                        if (existing.recurrence.includes('Monthly') && date.getDate() === existingStart.getDate()) {
+                            return true;
+                        }
+                    }
+                    
+                    return false;
+                })();
+                
+                if (!eventOccursOnDate) return false;
+                
+                // Calculate the time slots for this existing event on this date
+                let existingInstanceStart, existingInstanceEnd;
+                
+                if (existing.recurrence && existing.recurrence.length > 0 && 
+                    !(date.getDate() === existingStart.getDate() &&
+                      date.getMonth() === existingStart.getMonth() &&
+                      date.getFullYear() === existingStart.getFullYear())) {
+                    // For recurring events on different days, use original time on this date
+                    existingInstanceStart = new Date(date);
+                    existingInstanceStart.setHours(existingStart.getHours(), existingStart.getMinutes(), 0, 0);
+                    
+                    existingInstanceEnd = new Date(date);
+                    existingInstanceEnd.setHours(existingEnd.getHours(), existingEnd.getMinutes(), 0, 0);
+                } else if (existing.isMultiDay) {
+                    // For multi-day events, use original time on this date
+                    existingInstanceStart = new Date(date);
+                    existingInstanceStart.setHours(existingStart.getHours(), existingStart.getMinutes(), 0, 0);
+                    
+                    existingInstanceEnd = new Date(date);
+                    existingInstanceEnd.setHours(existingEnd.getHours(), existingEnd.getMinutes(), 0, 0);
+                } else {
+                    // For regular events, use original times
+                    existingInstanceStart = existingStart;
+                    existingInstanceEnd = existingEnd;
                 }
-
-                return false;
+                
+                // Check for time overlap
+                const hasOverlap = isOverlapping(newStart, newEnd, existingInstanceStart, existingInstanceEnd);
+                
+                // Debug logging
+                if (hasOverlap) {
+                    console.log('Overlap detected:', {
+                        newEvent: { title: event.title, start: newStart.toISOString(), end: newEnd.toISOString() },
+                        existingEvent: { 
+                            title: existing.title, 
+                            start: existingInstanceStart.toISOString(), 
+                            end: existingInstanceEnd.toISOString(),
+                            recurrence: existing.recurrence,
+                            isMultiDay: existing.isMultiDay
+                        },
+                        date: date.toISOString().split('T')[0]
+                    });
+                }
+                
+                return hasOverlap;
             });
         });
 

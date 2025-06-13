@@ -27,9 +27,18 @@ function DayCell({ date, isCurrentMonth, isToday, isSelected, onClick, allEvents
             d.getMonth() === date.getMonth() &&
             d.getFullYear() === date.getFullYear();
 
+        // Check if event starts on this day
         if (isSameDay(start)) return true;
-        if (start <= date && end >= date) return true;
+        
+        // Check for multi-day events - normalize dates to avoid time comparison issues
+        const eventStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        const eventEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        const currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        
+        // Multi-day event spanning this date
+        if (eventStart <= currentDate && eventEnd >= currentDate) return true;
 
+        // Recurring events
         if (event.recurrence && event.recurrence.length > 0 && start <= date) {
             const dayName = date.toLocaleString('en-US', { weekday: 'long' });
 
