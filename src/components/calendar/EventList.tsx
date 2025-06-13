@@ -53,9 +53,14 @@ function EventList({ selectedDate }: EventListProps) {
             {events.map((event) => (
                 <div
                     key={event.id}
-                    className="p-2 bg-primary text-primary-content rounded shadow"
+                    className={`p-2 ${event.isMultiDay ? 'bg-secondary' : 'bg-primary'} text-primary-content rounded shadow`}
                 >
-                    <h3 className="font-semibold">{event.title}</h3>
+                    <div className="flex justify-between">
+                        <h3 className="font-semibold">{event.title}</h3>
+                        {event.isMultiDay && (
+                            <span className="bg-accent text-accent-content text-xs px-1 rounded">Multi-day</span>
+                        )}
+                    </div>
                     <p className="text-sm">
                         {new Date(event.start).toLocaleTimeString([], {
                             hour: '2-digit',
@@ -66,11 +71,18 @@ function EventList({ selectedDate }: EventListProps) {
                             hour: '2-digit',
                             minute: '2-digit',
                         })}
-                        , {event.location || 'No location'}
+                        {event.location && `, ${event.location}`}
                     </p>
-                    <p className="text-xs text-primary-content/70">
-                        Created by {event.createdBy}
-                    </p>
+                    <div className="flex justify-between mt-1">
+                        <p className="text-xs text-primary-content/70">
+                            Created by {event.createdBy}
+                        </p>
+                        {event.recurrence && event.recurrence.length > 0 && (
+                            <span className="text-xs bg-accent text-accent-content px-1 rounded">
+                                {event.recurrence.includes('Monthly') ? 'Monthly' : 'Weekly'}
+                            </span>
+                        )}
+                    </div>
                 </div>
             ))}
         </div>

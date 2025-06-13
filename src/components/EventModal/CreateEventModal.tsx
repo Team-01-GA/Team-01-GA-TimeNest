@@ -63,20 +63,22 @@ function CreateEventModal() {
             return;
         }
 
-        if (recurrence.length > 0) {
-            const startDate = new Date(start);
-            const endDate = new Date(end);
+        const startDate = new Date(start);
+        const endDate = new Date(end);
 
-            const sameDay =
-                startDate.getFullYear() === endDate.getFullYear() &&
-                startDate.getMonth() === endDate.getMonth() &&
-                startDate.getDate() === endDate.getDate();
+        const sameDay =
+            startDate.getFullYear() === endDate.getFullYear() &&
+            startDate.getMonth() === endDate.getMonth() &&
+            startDate.getDate() === endDate.getDate();
 
-            if (!sameDay) {
-                showAlert(AlertTypes.ERROR, 'Recurring events must start and end on the same day.');
-                return;
-            }
+        // Multi-day check for recurring events
+        if (recurrence.length > 0 && !sameDay) {
+            showAlert(AlertTypes.ERROR, 'Recurring events must start and end on the same day.');
+            return;
         }
+
+        // Determine if this is a multi-day event
+        const isMultiDay = !sameDay;
 
         try {
             setLoading(true);
@@ -91,6 +93,7 @@ function CreateEventModal() {
                 isPublic,
                 location,
                 recurrence,
+                isMultiDay
             });
 
             showAlert(AlertTypes.SUCCESS, 'Event created successfully!');
@@ -129,18 +132,36 @@ function CreateEventModal() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
-                <input
-                    className="input input-bordered"
-                    type="datetime-local"
-                    value={start}
-                    onChange={(e) => setStart(e.target.value)}
-                />
-                <input
-                    className="input input-bordered"
-                    type="datetime-local"
-                    value={end}
-                    onChange={(e) => setEnd(e.target.value)}
-                />
+                <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Start date and time</span>
+                    </label>
+                    <input
+                        className="input input-bordered"
+                        type="datetime-local"
+                        value={start}
+                        onChange={(e) => setStart(e.target.value)}
+                    />
+                </div>
+                
+                <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">End date and time</span>
+                    </label>
+                    <input
+                        className="input input-bordered"
+                        type="datetime-local"
+                        value={end}
+                        onChange={(e) => setEnd(e.target.value)}
+                    />
+                    
+                    {start && end && new Date(start).getDate() !== new Date(end).getDate() && (
+                        <div className="text-sm text-info mt-1 bg-info/10 p-2 rounded-md">
+                            <span className="font-bold">Multi-day event:</span> This event spans multiple days. 
+                            The same time slot will be used for each day in the range.
+                        </div>
+                    )}
+                </div>
                 <input
                     className="input input-bordered"
                     type="text"
