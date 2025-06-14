@@ -11,9 +11,9 @@ type DayCellProps = {
 
 function DayCell({ date, isCurrentMonth, isToday, isSelected, onClick, allEvents }: DayCellProps) {
     const baseStyle =
-        'h-full border rounded cursor-pointer hover:bg-base-200 transition-all flex items-center justify-center';
+        'h-full border rounded cursor-pointer transition-all flex items-center justify-center';
     const monthStyle = isCurrentMonth ? '' : ' opacity-50';
-    const todayStyle = isToday ? ' bg-primary text-white font-bold' : '';
+    const todayStyle = isToday ? ' bg-primary text-white font-bold hover:bg-primary' : ' hover:bg-base-200';
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     const weekendStyle = isWeekend ? ' text-red-500' : '';
     const selectedStyle = isSelected ? ' ring-2 ring-primary' : '';

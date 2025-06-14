@@ -50,16 +50,22 @@ function EventList({ selectedDate }: EventListProps) {
 
     return (
         <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {events.map((event) => (
-                <div
-                    key={event.id}
-                    className={`p-2 ${event.isMultiDay ? 'bg-secondary' : 'bg-primary'} text-primary-content rounded shadow`}
-                >
+            {events.map((event) => {
+                // Determine background color based on event type
+                let bgColor = 'bg-primary'; // Default for single day
+                if (event.isMultiDay) {
+                    bgColor = 'bg-secondary';
+                } else if (event.recurrence && event.recurrence.length > 0) {
+                    bgColor = event.recurrence.includes('Monthly') ? 'bg-info' : 'bg-warning';
+                }
+                
+                return (
+                    <div
+                        key={event.id}
+                        className={`p-2 ${bgColor} text-primary-content rounded shadow`}
+                    >
                     <div className="flex justify-between">
                         <h3 className="font-semibold">{event.title}</h3>
-                        {event.isMultiDay && (
-                            <span className="bg-accent text-accent-content text-xs px-1 rounded">Multi-day</span>
-                        )}
                     </div>
                     <p className="text-sm">
                         {new Date(event.start).toLocaleTimeString([], {
@@ -77,14 +83,22 @@ function EventList({ selectedDate }: EventListProps) {
                         <p className="text-xs text-primary-content/70">
                             Created by {event.createdBy}
                         </p>
-                        {event.recurrence && event.recurrence.length > 0 && (
-                            <span className="text-xs bg-accent text-accent-content px-1 rounded">
-                                {event.recurrence.includes('Monthly') ? 'Monthly' : 'Weekly'}
-                            </span>
-                        )}
+                        <div className="flex gap-1">
+                            {event.isMultiDay && (
+                                <span className="text-xs bg-accent text-accent-content px-1 rounded">Multi-day</span>
+                            )}
+                            {event.recurrence && event.recurrence.length > 0 ? (
+                                <span className="text-xs bg-accent text-accent-content px-1 rounded">
+                                    {event.recurrence.includes('Monthly') ? 'Monthly' : 'Weekly'}
+                                </span>
+                            ) : !event.isMultiDay && (
+                                <span className="text-xs bg-accent text-accent-content px-1 rounded">Single Day</span>
+                            )}
+                        </div>
                     </div>
                 </div>
-            ))}
+                );
+            })}
         </div>
     );
 }

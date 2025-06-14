@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getAllEvents, type EventData } from '../../services/events.service';
 import { getStartOfWeek, isSameCalendarDay, addDays } from '../../utils/calendar.utils';
 
@@ -16,7 +16,8 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
     }, [selectedDate]);
 
     const hours = Array.from({ length: 24 }, (_, i) => i);
-    const days = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i));
+    // const days = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i));
+    const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i)), [startOfWeek]);
 
     useEffect(() => {
         async function fetchEvents() {
@@ -28,7 +29,7 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
             }
         }
         fetchEvents();
-    }, []); // Only fetch once like MonthView
+    }, []);
 
     function getEventsForDayAndHour(day: Date, hour: number): EventData[] {
         return events.filter((event) => {
@@ -80,14 +81,14 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                 eventEnd = end;
             }
 
-            // Check if this event overlaps with the current hour
+            // Check if this event should be displayed in the current hour slot
             const eventStartHour = eventStart.getHours();
             const eventEndHour = eventEnd.getHours();
             const eventEndMinutes = eventEnd.getMinutes();
 
-            // Event overlaps with this hour if:
+            // Event should be displayed in this hour if:
             // 1. Event starts in this hour, OR
-            // 2. Event ends in this hour (but not at exactly hour:00), OR
+            // 2. Event ends in this hour (but not at exactly hour:00), OR  
             // 3. Event spans across this hour
             return (eventStartHour === hour) ||
                 (eventEndHour === hour && eventEndMinutes > 0) ||
@@ -141,8 +142,8 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
 
                 {/* Hour rows */}
                 {hours.map((hour) => (
-                    <>
-                        <div key={`label-${hour}`} className="border-r border-b h-24 flex items-center justify-center text-xs">
+                    <div key={`hour-${hour}`} className="contents">
+                        <div className="border-r border-b h-24 flex items-center justify-center text-xs">
                             {hour.toString().padStart(2, '0')}:00
                         </div>
                         {days.map((day, i) => {
@@ -174,33 +175,60 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                                             eventEnd = originalEnd;
                                         }
 
-                                        const durationMinutes = (eventEnd.getTime() - eventStart.getTime()) / 60000;
-
                                         const startMinutes = eventStart.getHours() * 60 + eventStart.getMinutes();
+                                        const endMinutes = eventEnd.getHours() * 60 + eventEnd.getMinutes();
                                         const hourStart = hour * 60;
-                                        const topOffset = Math.max(0, startMinutes - hourStart);
-                                        const height = Math.min(durationMinutes, 60 - topOffset);
+                                        const hourEnd = hourStart + 60;
+                                        
+                                        // Calculate the portion of the event that appears in this hour
+                                        const visibleStart = Math.max(startMinutes, hourStart);
+                                        const visibleEnd = Math.min(endMinutes, hourEnd);
+                                        const visibleDuration = visibleEnd - visibleStart;
+                                        
+                                        const topOffset = visibleStart - hourStart;
+                                        const height = visibleDuration;
+
+                                        // Determine if this cell should show the event title
+                                        const eventStartHour = eventStart.getHours();
+                                        const eventEndHour = eventEnd.getHours();
+                                        const eventSpanHours = eventEndHour - eventStartHour + (eventEnd.getMinutes() > 0 ? 1 : 0);
+                                        
+                                        // Show title in the middle hour, or first hour if event is short
+                                        const titleHour = eventSpanHours <= 2 
+                                            ? eventStartHour 
+                                            : eventStartHour + Math.floor(eventSpanHours / 2);
+                                        
+                                        const showTitle = hour === titleHour;
+
+                                        // Determine background color based on event type (same as sidebar)
+                                        let eventBgColor = 'bg-primary text-primary-content'; // Default for single day
+                                        if (event.isMultiDay) {
+                                            eventBgColor = 'bg-secondary text-secondary-content';
+                                        } else if (event.recurrence && event.recurrence.length > 0) {
+                                            eventBgColor = event.recurrence.includes('Monthly') 
+                                                ? 'bg-info text-info-content' 
+                                                : 'bg-warning text-warning-content';
+                                        }
 
                                         return (
                                             <div
-                                                key={j}
+                                                key={`${event.id ?? `${hour}-${i}-${j}`}`}
                                                 title={event.title}
-                                                className="absolute left-1 right-1 bg-accent text-accent-content text-xs px-1 py-0.5 rounded overflow-hidden"
+                                                className={`absolute left-1 right-1 ${eventBgColor} text-xs px-1 py-0.5 overflow-hidden flex items-center justify-center`}
                                                 style={{
                                                     top: `${(topOffset / 60) * 100}%`,
                                                     height: `${Math.max((height / 60) * 100, 25)}%`,
                                                     minHeight: '1.25rem',
-                                                    lineHeight: '1rem',
                                                 }}
                                             >
-                                                {event.title}
+                                                {showTitle ? event.title : ''}
                                             </div>
                                         );
                                     })}
                                 </div>
                             );
                         })}
-                    </>
+                    </div>
                 ))}
             </div>
         </div>
