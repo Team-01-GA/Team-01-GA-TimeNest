@@ -35,6 +35,21 @@ export const getUserByEmail = async (email: string) => {
     }
 };
 
+export const getUserByPhone = async (number: string) => {
+    try {
+        const usersRef = ref(db, 'users');
+        const userQuery = query(
+            usersRef,
+            orderByChild('phoneNumber'),
+            equalTo(number)
+        );
+        return get(userQuery);
+    } catch (error) {
+        console.error('Error in getUserByPhone:', error);
+        throw error;
+    }
+};
+
 export const createUserHandle = (
     handle: string,
     uid: string,

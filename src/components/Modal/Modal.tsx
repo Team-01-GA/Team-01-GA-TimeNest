@@ -7,10 +7,11 @@ type ModalProps = {
     title: string,
     width: string,
     icon?: Icons | null,
+    className?: string,
     children: React.ReactNode,
 };
 
-const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal({ title, width, icon, children }, ref) {
+const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal({ title, width, icon, className, children }, ref) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -36,7 +37,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal({ title, wid
                 <div
                     onClick={(e) => e.stopPropagation()}
                     ref={ref}
-                    className='relative flex flex-col p-4 max-h-[60%] bg-base-100 rounded-box shadow-2xl shadow-base-300'
+                    className={`relative flex flex-col p-4 max-h-[60%] bg-base-100 rounded-box shadow-2xl shadow-base-300 outline-primary ${className}`}
                     style={{ width }}
                 >
                     <div className="absolute z-[4] flex top-0 left-0 w-[calc(100%-2rem)] mr-8 h-20 bg-base-100/60 backdrop-blur-[3px] rounded-2xl">

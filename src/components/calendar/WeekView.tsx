@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getAllEvents, type EventData } from '../../services/events.service';
 import { getStartOfWeek, isSameCalendarDay, addDays } from '../../utils/calendar.utils';
+import { Icons } from '../../constants/icon.constants';
+import { useNavigate } from 'react-router-dom';
 
 type WeekViewProps = {
     selectedDate: Date;
@@ -10,6 +12,8 @@ type WeekViewProps = {
 function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
     const [events, setEvents] = useState<EventData[]>([]);
     const [startOfWeek, setStartOfWeek] = useState(getStartOfWeek(selectedDate));
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setStartOfWeek(getStartOfWeek(selectedDate));
@@ -106,25 +110,33 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
 
     return (
         <div className="flex flex-col w-full h-full overflow-y-auto">
-            <div className="flex flex-col items-center mb-4">
-                <div className="flex justify-between items-center w-full px-4 mb-2">
-                    <button className="btn btn-sm" onClick={goPrevWeek}>←</button>
-                    <h2 className="text-lg font-bold text-center">
+            <div className="flex items-center justify-between w-full pl-6 pr-6 mb-4 gap-4 shrink-0">
+                <div className="flex items-center justify-start gap-4">
+                    <h2 className="text-6xl font-bold text-center">
                         Week of {startOfWeek.toLocaleDateString('en-GB')}
                     </h2>
-                    <button className="btn btn-sm" onClick={goNextWeek}>→</button>
+                    <button className="btn btn-xl" onClick={goPrevWeek}>←</button>
+                    <button className="btn btn-xl" onClick={goNextWeek}>→</button>
+                </div>
+                <div className='flex items-center justify-start gap-4'>
+                    <button
+                        className="btn btn-xl"
+                        onClick={() => {
+                            const today = new Date();
+                            setSelectedDate(today);
+                            setStartOfWeek(getStartOfWeek(today));
+                        }}
+                    >
+                        Current Week
+                    </button>
+                    <button
+                        className="btn btn-xl btn-accent flex items-center gap-2"
+                        onClick={() => navigate('/app/event/create')}
+                    >
+                        <i className={Icons.ADD}></i>
+                    </button>
                 </div>
 
-                <button
-                    className="btn btn-sm btn-outline mt-2"
-                    onClick={() => {
-                        const today = new Date();
-                        setSelectedDate(today);
-                        setStartOfWeek(getStartOfWeek(today));
-                    }}
-                >
-                    Current Week
-                </button>
             </div>
 
             <div className="grid grid-cols-8 w-full border-t border-l text-sm min-w-[900px]">

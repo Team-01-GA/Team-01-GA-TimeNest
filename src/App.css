@@ -1,3 +1,15 @@
+@keyframes auth-anim {
+    0% {
+        outline: 6px solid transparent;
+    }
+    50% {
+        outline: 6px solid #fcb700;
+    }
+    100% {
+        outline: 6px solid transparent;
+    }
+}
+
 @keyframes alert-anim {
     0% {
         opacity: 0;

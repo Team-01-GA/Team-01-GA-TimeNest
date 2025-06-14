@@ -19,7 +19,7 @@ type OtherAccountProps = {
 
 function OtherAccountsDetails({userObject, events}: OtherAccountProps) {
     
-    const { userData, setUserData } = useContext(UserContext);
+    const { userData } = useContext(UserContext);
     const { location } = useContext(LocationContext);
     const { showAlert } = useContext(AlertContext);
     const { openDropdown } = useContext(DropdownContext);

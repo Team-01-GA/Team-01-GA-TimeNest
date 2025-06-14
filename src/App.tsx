@@ -176,7 +176,7 @@ function App() {
                                         <>
                                             <Route path="/app" element={
                                                 <AnimatedPage>
-                                                    <CalendarPage calendarType={calendarType} />
+                                                    <CalendarPage calendarType={calendarType} setCalendarType={setCalendarType} />
                                                 </AnimatedPage>
                                             }>
                                                 <Route path='/app/event/create' element={<CreateEventModal />}/>

@@ -9,10 +9,12 @@ import { getAllEvents, type EventData } from '../../services/events.service';
 type MonthViewProps = {
     selectedDate: Date;
     setSelectedDate: (date: Date) => void;
+    visibleDate: Date;
+    setVisibleDate: React.Dispatch<React.SetStateAction<Date>>;
 };
 
-function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
-    const [visibleDate, setVisibleDate] = useState(new Date());
+function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate }: MonthViewProps) {
+    
     const [allEvents, setAllEvents] = useState<EventData[]>([]);
 
     const navigate = useNavigate();
@@ -58,12 +60,23 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
     return (
         <div className="w-full h-full flex flex-col">
             {/* Month Header */}
-            <div className="flex items-center justify-between mb-2 shrink-0">
-                <button className="btn btn-sm" onClick={goToPreviousMonth}>←</button>
-                <h2 className="text-lg font-semibold">
-                    {visibleDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                </h2>
-                <button className="btn btn-sm" onClick={goToNextMonth}>→</button>
+            <div className="flex items-center justify-between w-full pl-6 pr-6 mb-4 gap-4 shrink-0">
+                <div className='flex items-center justify-start gap-4'>
+                    <h2 className="text-6xl font-semibold">
+                        {visibleDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                    </h2>
+                    <button className="btn btn-xl" onClick={goToPreviousMonth}>←</button>
+                    <button className="btn btn-xl" onClick={goToNextMonth}>→</button>
+                </div>
+                <div className='flex items-center justify-start gap-4'>
+                    <button className='btn btn-xl' onClick={goToToday}>Today</button>
+                    <button
+                        className="btn btn-xl btn-accent flex items-center gap-2"
+                        onClick={() => navigate('/app/event/create')}
+                    >
+                        <i className={Icons.ADD}></i>
+                    </button>
+                </div>
             </div>
 
             {/* Today Button
@@ -72,19 +85,6 @@ function MonthView({ selectedDate, setSelectedDate }: MonthViewProps) {
                     Today
                 </button>
             </div> */}
-
-            <div className="flex flex-col items-center gap-2 mb-4 shrink-0">
-                <button className="btn btn-xs btn-outline" onClick={goToToday}>
-                    Today
-                </button>
-                <button
-                    className="btn btn-sm btn-accent flex items-center gap-2"
-                    onClick={() => navigate('/app/event/create')}
-                >
-                    <i className={Icons.MODAL_CREATE_EVENT}></i>
-                    Create Event
-                </button>
-            </div>
 
             {/* Weekday labels */}
             <div className="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-base-content/70 shrink-0">

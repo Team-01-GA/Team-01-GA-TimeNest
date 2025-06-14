@@ -4,10 +4,14 @@ type Direction = "up" | "down" | "left" | "right";
 
 export default function AnimatedPage({
     children,
-    direction = "up"
+    direction = "up",
+    width,
+    className
 }: {
-    children: React.ReactNode,
-    direction?: Direction
+    children: React.ReactNode;
+    direction?: Direction;
+    width?: string;
+    className?: string;
 }) {
     const initial = { opacity: 0 } as TargetAndTransition;
     const exit = { opacity: 0 } as TargetAndTransition;
@@ -34,7 +38,7 @@ export default function AnimatedPage({
 
     return (
         <motion.div
-            className='w-full h-full'
+            className={`${width ? width : 'w-full'} h-full ${className}`}
             initial={initial}
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={exit}

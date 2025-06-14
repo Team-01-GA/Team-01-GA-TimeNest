@@ -10,51 +10,56 @@ type loginFields = {
     password: string;
 };
 
-function Login() {
+function Login({ loading, setLoading }: { loading: boolean; setLoading: React.Dispatch<React.SetStateAction<boolean>>; }) {
     const [fields, setFields] = useState<loginFields>({
         email: '',
         password: '',
     });
+
     const { setUser } = useContext(UserContext);
     const { showAlert } = useContext(AlertContext);
 
     const navigate = useNavigate();
 
-    const onLogin = (): void => {
-        if (
-            !fields.email ||
-            !fields.email.includes('@') ||
-            !fields.email.includes('.')
-        ) {
-            showAlert(
-                AlertTypes.WARNING,
-                'Please provide a valid email address.'
-            );
-            return;
-        }
-        if (!fields.password) {
-            showAlert(AlertTypes.WARNING, 'Please provide a password.');
-            return;
-        }
+    const onLogin = async (): Promise<void> => {
+        try {
+            setLoading(true);
+            if (
+                !fields.email ||
+                !fields.email.includes('@') ||
+                !fields.email.includes('.')
+            ) {
+                showAlert(
+                    AlertTypes.WARNING,
+                    'Please provide a valid email address.'
+                );
+                return;
+            }
+            if (!fields.password) {
+                showAlert(AlertTypes.WARNING, 'Please provide a password.');
+                return;
+            }
+    
+            const credential = await loginUser(fields.email, fields.password);
+            
+            setUser(credential.user);
 
-        loginUser(fields.email, fields.password)
-            .then((credential) => {
-                setUser(credential.user);
-            })
-            .then(() => {
-                navigate('/app');
-            })
-            .catch((e: unknown) => {
-                if (e instanceof Error) {
-                    if (e.message.includes('wrong-password')) {
-                        showAlert(AlertTypes.WARNING, 'Invalid credentials.');
-                        return;
-                    }
-                    showAlert(AlertTypes.ERROR, e.message);
-                } else {
-                    showAlert(AlertTypes.ERROR, String(e));
+            navigate('/app');
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                if (error.message.includes('wrong-password') || error.message.includes('invalid-credential')) {
+                    showAlert(AlertTypes.WARNING, 'Invalid credentials.');
+                    return;
                 }
-            });
+                showAlert(AlertTypes.ERROR, error.message);
+            } else {
+                showAlert(AlertTypes.ERROR, String(error));
+            }
+        }
+        finally {
+            setLoading(false);
+        }
     };
 
     const saveInputs = (field: string, value: string): void => {
@@ -79,6 +84,7 @@ function Login() {
                         type="email"
                         autoComplete='email'
                         value={fields.email}
+                        disabled={loading}
                         onChange={(e) => saveInputs('email', e.target.value)}
                     />
                 </label>
@@ -91,10 +97,11 @@ function Login() {
                         type="password"
                         autoComplete='current-password'
                         value={fields.password}
+                        disabled={loading}
                         onChange={(e) => saveInputs('password', e.target.value)}
                     />
                 </label>
-                <button className='btn btn-primary btn-lg mt-4 relative'>
+                <button className='btn btn-primary btn-lg mt-4 relative' disabled={loading}>
                     Sign in
                 </button>
             </fieldset>
