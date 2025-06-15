@@ -13,6 +13,9 @@ type WeekViewProps = {
 function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
     const [events, setEvents] = useState<EventData[]>([]);
     const [startOfWeek, setStartOfWeek] = useState(getStartOfWeek(selectedDate));
+    const [showWorkWeekOnly, setShowWorkWeekOnly] = useState(() => {
+        return localStorage.getItem('showWorkWeekOnly') === 'true';
+    });
 
     const { userData } = useContext(UserContext);
     const navigate = useNavigate();
@@ -22,7 +25,10 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
     }, [selectedDate]);
 
     const hours = Array.from({ length: 24 }, (_, i) => i);
-    const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i)), [startOfWeek]);
+    const days = useMemo(() => {
+        const allDays = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i));
+        return showWorkWeekOnly ? allDays.slice(0, 5) : allDays;
+    }, [startOfWeek, showWorkWeekOnly]);
 
     useEffect(() => {
         async function fetchEvents() {
@@ -121,6 +127,21 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                     <button className="btn btn-xl" onClick={goNextWeek}>→</button>
                 </div>
                 <div className='flex items-center justify-start gap-4'>
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-base">Work Week</span>
+                        <input
+                            type="checkbox"
+                            className="toggle toggle-md toggle-primary"
+                            checked={showWorkWeekOnly}
+                            onChange={() => {
+                                setShowWorkWeekOnly((prev) => {
+                                    const next = !prev;
+                                    localStorage.setItem("showWorkWeekOnly", String(next));
+                                    return next;
+                                });
+                            }}
+                        />
+                    </div>
                     <button
                         className="btn btn-xl"
                         onClick={() => {
@@ -141,7 +162,8 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
 
             </div>
 
-            <div className="grid grid-cols-8 w-full border-t border-l text-sm min-w-[900px]">
+            {/* <div className="grid grid-cols-8 w-full border-t border-l text-sm min-w-[900px]"> */}
+            <div className={`grid ${showWorkWeekOnly ? 'grid-cols-6' : 'grid-cols-8'} w-full border-t border-l text-sm min-w-[900px]`}>
                 {/* Top Row: Time + Weekdays */}
                 <div className="bg-base-200 border-r border-b h-10 flex items-center justify-center font-semibold">Time</div>
                 {days.map((day, i) => (
