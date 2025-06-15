@@ -26,6 +26,7 @@ import type { DropdownTypes } from './constants/dropdown.constants';
 import DropdownContext from './providers/DropdownContext';
 import NewContactListModal from './components/NewContactListModal/NewContactListModal';
 import EventDetailsRouteModal from './components/EventDetailsModal/EventDetailsRouteModal';
+import EditEventModal from './components/EditEventModal/EditEventModal';
 
 function App() {
     const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -184,6 +185,7 @@ function App() {
                                                 <Route path='/app/account/:userHandle' element={<ProfileModal />} />
                                                 <Route path='/app/account/create-list' element={<NewContactListModal />} />
                                                 <Route path='/app/event/:eventId' element={<EventDetailsRouteModal />} />
+                                                <Route path="/app/event/edit/:eventId" element={<EditEventModal />} />
                                             </Route>
                                             <Route path="*" element={<Navigate to="/app" replace />} />
                                         </>

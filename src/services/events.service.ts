@@ -242,3 +242,27 @@ export const getUserEventsForDate = async (
         return [];
     }
 };
+
+export const updateEvent = async (eventId: string, updatedData: Partial<EventData>) => {
+    try {
+        // Fetch existing data first
+        const snapshot = await get(child(ref(db), `events/${eventId}`));
+        if (!snapshot.exists()) {
+            throw new Error('Event not found');
+        }
+
+        const existingEvent = snapshot.val() as EventData;
+
+        // Merge with updated data
+        const mergedEvent: EventData = {
+            ...existingEvent,
+            ...updatedData,
+            id: eventId,
+        };
+
+        await update(ref(db, `events/${eventId}`), mergedEvent);
+    } catch (err) {
+        console.error("Failed to update event:", err);
+        throw err;
+    }
+};

@@ -148,7 +148,7 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                     <button
                         key={i}
                         onClick={() => setSelectedDate(day)}
-                        className={`bg-base-200 border-r border-b h-10 flex items-center justify-center font-semibold w-full ${isSameCalendarDay(day, selectedDate) ? 'bg-primary text-white' : ''}`}
+                        className={`bg-base-200 border-r border-b h-10 flex items-center justify-center font-semibold w-full ${isSameCalendarDay(day, selectedDate) ? 'bg-primary text-white' : ''} cursor-pointer`}
                     >
                         {day.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' })}
                     </button>
@@ -229,7 +229,7 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                                                 key={`${event.id ?? `${hour}-${i}-${j}`}`}
                                                 title={event.title}
                                                 onClick={() => navigate(`/app/event/${event.id}`)}
-                                                className={`absolute left-1 right-1 ${eventBgColor} text-xs px-1 py-0.5 overflow-hidden flex items-center justify-center cursor-pointer`}
+                                                className={`absolute left-1 right-1 ${eventBgColor} text-xs px-1 py-0.5 overflow-hidden flex items-center justify-center cursor-pointer font-bold`}
                                                 style={{
                                                     top: `${(topOffset / 60) * 100}%`,
                                                     height: `${Math.max((height / 60) * 100, 25)}%`,

@@ -62,8 +62,21 @@ function EventDetailsModal({ event }: { event: EventData }) {
                         </div>
                     )}
 
+                    <p>
+                        <strong>Created On:</strong>{' '}
+                        {event.createdOn
+                            ? new Date(event.createdOn).toLocaleString()
+                            : 'N/A'}
+                    </p>
+
                     {userData && (userData.handle === event.createdBy || userData.isAdmin) && (
                         <div className="flex justify-end gap-4 mt-2">
+                            <button
+                                className="btn btn-sm btn-outline"
+                                onClick={() => navigate(`/app/event/edit/${event.id}`)}
+                            >
+                                Edit
+                            </button>
                             <button onClick={() => setShowConfirm(true)} className="btn btn-error btn-sm">
                                 Delete
                             </button>
