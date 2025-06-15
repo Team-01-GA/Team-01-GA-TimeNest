@@ -25,6 +25,7 @@ import ProfileModal from './components/ProfileModal/ProfileModal';
 import type { DropdownTypes } from './constants/dropdown.constants';
 import DropdownContext from './providers/DropdownContext';
 import NewContactListModal from './components/NewContactListModal/NewContactListModal';
+import EventDetailsRouteModal from './components/EventDetailsModal/EventDetailsRouteModal';
 
 function App() {
     const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -111,12 +112,12 @@ function App() {
                 const usersObj = snapshot.val();
                 // Extract first user from the query result
                 const firstUser = Object.values(usersObj)[0] as UserData;
-                
+
                 // Ensure handle is present
                 if (!firstUser.handle) {
                     throw new Error('User profile incomplete - missing handle');
                 }
-                
+
                 setUserData(firstUser as UserData);
             })
             .catch((err) => {
@@ -151,7 +152,7 @@ function App() {
             <Loader key='loader' />
         </AnimatePresence>
     );
-    
+
     return (
         <AppContext.Provider value={UserContextValue}>
             <AlertContext.Provider value={AlertContextValue}>
@@ -162,13 +163,13 @@ function App() {
                             id="main-app"
                             className="flex flex-col w-full justify-center h-[100vh] pt-24 bg-base-200 overflow-hidden"
                         >
-                            {firebaseUser && <Header calendarType={calendarType} setCalendarType={setCalendarType}/>}
+                            {firebaseUser && <Header calendarType={calendarType} setCalendarType={setCalendarType} />}
                             <AnimatePresence mode='wait'>
                                 <Routes>
                                     {firebaseUser === null ? (
                                         <>
                                             <Route path="/welcome" element={<HomePage />}>
-                                                <Route path='/welcome/auth' element={<AuthModal/>} />
+                                                <Route path='/welcome/auth' element={<AuthModal />} />
                                             </Route>
                                             <Route path="*" element={<Navigate to="/welcome" replace />} />
                                         </>
@@ -179,9 +180,10 @@ function App() {
                                                     <CalendarPage calendarType={calendarType} setCalendarType={setCalendarType} />
                                                 </AnimatedPage>
                                             }>
-                                                <Route path='/app/event/create' element={<CreateEventModal />}/>
-                                                <Route path='/app/account/:userHandle' element={<ProfileModal />}/>
-                                                <Route path='/app/account/create-list' element={<NewContactListModal />}/>
+                                                <Route path='/app/event/create' element={<CreateEventModal />} />
+                                                <Route path='/app/account/:userHandle' element={<ProfileModal />} />
+                                                <Route path='/app/account/create-list' element={<NewContactListModal />} />
+                                                <Route path='/app/event/:eventId' element={<EventDetailsRouteModal />} />
                                             </Route>
                                             <Route path="*" element={<Navigate to="/app" replace />} />
                                         </>

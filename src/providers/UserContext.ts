@@ -13,6 +13,7 @@ export interface UserData {
     bio?: string;
     createdOn: string;
     [key: string]: unknown;
+    isAdmin?: boolean;
 }
 // export interface UserData {
 //   uid: string;

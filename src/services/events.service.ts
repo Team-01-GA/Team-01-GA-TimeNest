@@ -1,4 +1,4 @@
-import { ref, push, update, get } from 'firebase/database';
+import { ref, push, update, get, child } from 'firebase/database';
 import { db } from '../config/firebase-config';
 
 export interface EventData {
@@ -48,8 +48,8 @@ export const addEvent = async (event: EventData) => {
 
         if (event.recurrence && event.recurrence.length > 0) {
             const sameDay = startDate.getDate() === endDate.getDate() &&
-                            startDate.getMonth() === endDate.getMonth() &&
-                            startDate.getFullYear() === endDate.getFullYear();
+                startDate.getMonth() === endDate.getMonth() &&
+                startDate.getFullYear() === endDate.getFullYear();
 
             if (!sameDay) {
                 throw new Error('Recurring events must start and end on the same day.');
@@ -57,8 +57,8 @@ export const addEvent = async (event: EventData) => {
         }
 
         const isMultiDay = startDate.getDate() !== endDate.getDate() ||
-                           startDate.getMonth() !== endDate.getMonth() ||
-                           startDate.getFullYear() !== endDate.getFullYear();
+            startDate.getMonth() !== endDate.getMonth() ||
+            startDate.getFullYear() !== endDate.getFullYear();
         event.isMultiDay = isMultiDay;
 
         if (!event.participants.includes(event.createdBy)) {
@@ -142,3 +142,25 @@ export const getEventsForDate = async (targetDate: Date): Promise<EventData[]> =
         return [];
     }
 };
+
+
+export const getEventById = async (eventId: string): Promise<EventData> => {
+    const snapshot = await get(child(ref(db), `events/${eventId}`));
+    if (!snapshot.exists()) {
+        throw new Error('Event not found');
+    }
+    return { id: eventId, ...snapshot.val() } as EventData;
+}
+
+
+export const deleteEvent = async (eventId: string, creatorHandle: string): Promise<void> => {
+    try {
+        await update(ref(db), {
+            [`events/${eventId}`]: null,
+            [`users/${creatorHandle}/events/${eventId}`]: null
+        });
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        throw error;
+    }
+}

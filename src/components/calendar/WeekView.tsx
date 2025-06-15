@@ -226,7 +226,8 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                                             <div
                                                 key={`${event.id ?? `${hour}-${i}-${j}`}`}
                                                 title={event.title}
-                                                className={`absolute left-1 right-1 ${eventBgColor} text-xs px-1 py-0.5 overflow-hidden flex items-center justify-center`}
+                                                onClick={() => navigate(`/app/event/${event.id}`)}
+                                                className={`absolute left-1 right-1 ${eventBgColor} text-xs px-1 py-0.5 overflow-hidden flex items-center justify-center cursor-pointer`}
                                                 style={{
                                                     top: `${(topOffset / 60) * 100}%`,
                                                     height: `${Math.max((height / 60) * 100, 25)}%`,
