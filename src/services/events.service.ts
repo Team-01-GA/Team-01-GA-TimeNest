@@ -82,6 +82,9 @@ export const addEvent = async (event: EventData) => {
     }
 };
 
+// 	Admin features
+// 	Global search bar
+// 	Public event feeds
 export const getAllEvents = async (): Promise<EventData[]> => {
     try {
         const snapshot = await get(ref(db, 'events'));
@@ -93,6 +96,9 @@ export const getAllEvents = async (): Promise<EventData[]> => {
     }
 };
 
+// 	Admin features
+// 	Global search bar
+// 	Public event feeds
 export const getEventsForDate = async (targetDate: Date): Promise<EventData[]> => {
     try {
         const allEvents = await getAllEvents();
@@ -164,3 +170,75 @@ export const deleteEvent = async (eventId: string, creatorHandle: string): Promi
         throw error;
     }
 }
+
+
+// local user only
+export const getUserEvents = async (handle: string): Promise<EventData[]> => {
+    try {
+        const snapshot = await get(ref(db, 'events'));
+        if (!snapshot.exists()) return [];
+
+        const allEvents = Object.values(snapshot.val()) as EventData[];
+        return allEvents.filter(
+            event => event.createdBy === handle || event.participants?.includes(handle)
+        );
+    } catch (error) {
+        console.error('Error fetching user events:', error);
+        return [];
+    }
+};
+
+
+// local user only
+export const getUserEventsForDate = async (
+    handle: string,
+    targetDate: Date
+): Promise<EventData[]> => {
+    try {
+        const allEvents = await getUserEvents(handle);
+
+        const isSameDay = (d1: Date, d2: Date) =>
+            d1.getDate() === d2.getDate() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getFullYear() === d2.getFullYear();
+
+        return allEvents.filter((event) => {
+            const start = new Date(event.start);
+            const end = new Date(event.end);
+
+            if (isSameDay(start, targetDate)) return true;
+
+            if (event.isMultiDay && targetDate >= start && targetDate <= end) return true;
+
+            if (!event.isMultiDay && start <= targetDate && end >= targetDate) return true;
+
+            if (event.recurrence && targetDate >= start) {
+                if (event.recurrence.includes('Monthly') && targetDate.getDate() === start.getDate()) return true;
+                const dayName = targetDate.toLocaleString('en-US', { weekday: 'long' });
+                if (event.recurrence.includes(dayName)) return true;
+            }
+
+            return false;
+        }).map(event => {
+            if (event.isMultiDay) {
+                const display = { ...event };
+                const displayStart = new Date(targetDate);
+                const originalStart = new Date(event.start);
+                const originalEnd = new Date(event.end);
+
+                displayStart.setHours(originalStart.getHours(), originalStart.getMinutes(), 0, 0);
+                const displayEnd = new Date(targetDate);
+                displayEnd.setHours(originalEnd.getHours(), originalEnd.getMinutes(), 0, 0);
+
+                display.start = displayStart.toISOString();
+                display.end = displayEnd.toISOString();
+                return display;
+            }
+
+            return event;
+        });
+    } catch (error) {
+        console.error('Error filtering user events by date:', error);
+        return [];
+    }
+};

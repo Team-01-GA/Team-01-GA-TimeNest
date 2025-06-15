@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { getEventsForDate, type EventData } from '../../services/events.service';
+import { useContext, useEffect, useState } from 'react';
+import { getUserEventsForDate, type EventData } from '../../services/events.service';
+import UserContext from '../../providers/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 type EventListProps = {
@@ -12,20 +13,21 @@ function EventList({ selectedDate }: EventListProps) {
 
     const navigate = useNavigate();
 
+    const { userData } = useContext(UserContext);
+    
     useEffect(() => {
         async function fetchEvents() {
+            if (!userData?.handle) return;
+
             setLoading(true);
             try {
-                const filtered = await getEventsForDate(selectedDate);
+                const filtered = await getUserEventsForDate(userData.handle, selectedDate);
 
-                // this monstrosity sorts by start hour
                 filtered.sort((a, b) => {
                     const aDate = new Date(a.start);
                     const bDate = new Date(b.start);
-
                     const aMinutes = aDate.getHours() * 60 + aDate.getMinutes();
                     const bMinutes = bDate.getHours() * 60 + bDate.getMinutes();
-
                     return aMinutes - bMinutes;
                 });
 
@@ -38,7 +40,7 @@ function EventList({ selectedDate }: EventListProps) {
         }
 
         fetchEvents();
-    }, [selectedDate]);
+    }, [selectedDate, userData?.handle]);
 
     // if (loading) return <p className="p-2">Loading events...</p>;
     if (loading) {

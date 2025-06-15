@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { getAllEvents, type EventData } from '../../services/events.service';
+import { useEffect, useMemo, useState, useContext } from 'react';
+import { getUserEvents, type EventData } from '../../services/events.service';
 import { getStartOfWeek, isSameCalendarDay, addDays } from '../../utils/calendar.utils';
 import { Icons } from '../../constants/icon.constants';
 import { useNavigate } from 'react-router-dom';
+import UserContext from '../../providers/UserContext';
 
 type WeekViewProps = {
     selectedDate: Date;
@@ -13,6 +14,7 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
     const [events, setEvents] = useState<EventData[]>([]);
     const [startOfWeek, setStartOfWeek] = useState(getStartOfWeek(selectedDate));
 
+    const { userData } = useContext(UserContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -20,20 +22,20 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
     }, [selectedDate]);
 
     const hours = Array.from({ length: 24 }, (_, i) => i);
-    // const days = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i));
     const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i)), [startOfWeek]);
 
     useEffect(() => {
         async function fetchEvents() {
+            if (!userData?.handle) return;
             try {
-                const all = await getAllEvents();
-                setEvents(all);
+                const userEvents = await getUserEvents(userData.handle);
+                setEvents(userEvents);
             } catch (err) {
                 console.error('Failed to fetch events for week view', err);
             }
         }
         fetchEvents();
-    }, []);
+    }, [userData?.handle]);
 
     function getEventsForDayAndHour(day: Date, hour: number): EventData[] {
         return events.filter((event) => {
@@ -191,12 +193,12 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                                         const endMinutes = eventEnd.getHours() * 60 + eventEnd.getMinutes();
                                         const hourStart = hour * 60;
                                         const hourEnd = hourStart + 60;
-                                        
+
                                         // Calculate the portion of the event that appears in this hour
                                         const visibleStart = Math.max(startMinutes, hourStart);
                                         const visibleEnd = Math.min(endMinutes, hourEnd);
                                         const visibleDuration = visibleEnd - visibleStart;
-                                        
+
                                         const topOffset = visibleStart - hourStart;
                                         const height = visibleDuration;
 
@@ -204,12 +206,12 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                                         const eventStartHour = eventStart.getHours();
                                         const eventEndHour = eventEnd.getHours();
                                         const eventSpanHours = eventEndHour - eventStartHour + (eventEnd.getMinutes() > 0 ? 1 : 0);
-                                        
+
                                         // Show title in the middle hour, or first hour if event is short
-                                        const titleHour = eventSpanHours <= 2 
-                                            ? eventStartHour 
+                                        const titleHour = eventSpanHours <= 2
+                                            ? eventStartHour
                                             : eventStartHour + Math.floor(eventSpanHours / 2);
-                                        
+
                                         const showTitle = hour === titleHour;
 
                                         // Determine background color based on event type (same as sidebar)
@@ -217,8 +219,8 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
                                         if (event.isMultiDay) {
                                             eventBgColor = 'bg-secondary text-secondary-content';
                                         } else if (event.recurrence && event.recurrence.length > 0) {
-                                            eventBgColor = event.recurrence.includes('Monthly') 
-                                                ? 'bg-info text-info-content' 
+                                            eventBgColor = event.recurrence.includes('Monthly')
+                                                ? 'bg-info text-info-content'
                                                 : 'bg-warning text-warning-content';
                                         }
 

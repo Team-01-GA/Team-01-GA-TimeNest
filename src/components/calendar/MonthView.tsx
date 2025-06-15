@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
 import { Icons } from '../../constants/icon.constants';
 import { useNavigate } from 'react-router-dom';
-import { getAllEvents, type EventData } from '../../services/events.service';
+import { getUserEvents, type EventData } from '../../services/events.service';
+import UserContext from '../../providers/UserContext';
 
 type MonthViewProps = {
     selectedDate: Date;
@@ -14,22 +15,22 @@ type MonthViewProps = {
 };
 
 function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate }: MonthViewProps) {
-    
     const [allEvents, setAllEvents] = useState<EventData[]>([]);
-
+    const { userData } = useContext(UserContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         async function loadEvents() {
+            if (!userData?.handle) return;
             try {
-                const events = await getAllEvents();
+                const events = await getUserEvents(userData.handle);
                 setAllEvents(events);
             } catch (err) {
                 console.error('Failed to fetch events for calendar grid', err);
             }
         }
         loadEvents();
-    }, []);
+    }, [userData?.handle]);
 
     function goToPreviousMonth() {
         const prev = new Date(visibleDate);
@@ -78,13 +79,6 @@ function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate 
                     </button>
                 </div>
             </div>
-
-            {/* Today Button
-            <div className="flex justify-center mb-4 shrink-0">
-                <button className="btn btn-xs btn-outline" onClick={goToToday}>
-                    Today
-                </button>
-            </div> */}
 
             {/* Weekday labels */}
             <div className="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-base-content/70 shrink-0">
