@@ -171,6 +171,7 @@ function App() {
                                         <>
                                             <Route path="/welcome" element={<HomePage />}>
                                                 <Route path='/welcome/auth' element={<AuthModal />} />
+                                                <Route path='/welcome/event/:eventId' element={<EventDetailsRouteModal />} />
                                             </Route>
                                             <Route path="*" element={<Navigate to="/welcome" replace />} />
                                         </>

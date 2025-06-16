@@ -1,6 +1,6 @@
 import Modal from "../Modal/Modal";
 import { type EventData, deleteEvent } from "../../services/events.service";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import UserContext from "../../providers/UserContext";
 import AlertContext from "../../providers/AlertContext";
@@ -11,7 +11,9 @@ function EventDetailsModal({ event }: { event: EventData }) {
 
     const { userData } = useContext(UserContext);
     const { showAlert } = useContext(AlertContext);
+
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleDelete = async () => {
         try {
@@ -34,15 +36,18 @@ function EventDetailsModal({ event }: { event: EventData }) {
                     <p><strong>Start:</strong> {new Date(event.start).toLocaleString()}</p>
                     <p><strong>End:</strong> {new Date(event.end).toLocaleString()}</p>
                     <p><strong>Location:</strong> {event.location || 'N/A'}</p>
-                    <p>
+                    <div>
                         <strong>Created By:</strong>{' '}
-                        <Link
-                            to={`/app/account/${event.createdBy}`}
-                            className="px-2 py-1 bg-base-300 rounded hover:bg-base-200 transition text-sm"
-                        >
-                            {event.createdBy}
-                        </Link>
-                    </p>
+                        {!location.pathname.includes('welcome')
+                            ? <Link
+                                to={`/app/account/${event.createdBy}`}
+                                className="px-2 py-1 bg-base-300 rounded hover:bg-base-200 transition text-sm"
+                            >
+                                {event.createdBy}
+                            </Link>
+                            : <p className="px-2 py-1 bg-base-300 rounded hover:bg-base-200 transition text-sm w-fit">{event.createdBy}</p>
+                        }
+                    </div>
 
                     {event.participants?.length > 0 && (
                         <div>
@@ -50,12 +55,15 @@ function EventDetailsModal({ event }: { event: EventData }) {
                             <ul className="flex flex-wrap gap-2 mt-1">
                                 {event.participants.map((handle) => (
                                     <li key={handle}>
-                                        <Link
-                                            to={`/app/account/${handle}`}
-                                            className="px-2 py-1 bg-base-300 rounded hover:bg-base-200 transition text-sm"
-                                        >
-                                            @{handle}
-                                        </Link>
+                                        {!location.pathname.includes('welcome')
+                                            ? <Link
+                                                to={`/app/account/${handle}`}
+                                                className="px-2 py-1 bg-base-300 rounded hover:bg-base-200 transition text-sm"
+                                            >
+                                                @{handle}
+                                            </Link>
+                                            : <p className="px-2 py-1 bg-base-300 rounded hover:bg-base-200 transition text-sm">@{handle}</p>
+                                        }
                                     </li>
                                 ))}
                             </ul>
