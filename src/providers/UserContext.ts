@@ -12,8 +12,11 @@ export interface UserData {
     sharesContacts?: boolean;
     bio?: string;
     createdOn: string;
-    [key: string]: unknown;
     isAdmin?: boolean;
+    uid: string;
+    newEventsPublic: boolean,
+    openInvites: boolean,
+    [key: string]: unknown;
 }
 // export interface UserData {
 //   uid: string;

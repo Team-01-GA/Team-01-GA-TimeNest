@@ -6,6 +6,7 @@ import { addEvent } from '../../services/events.service';
 import { AlertTypes } from '../../constants/alert.constants';
 import { Icons } from '../../constants/icon.constants';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getUserByHandle } from '../../services/users.service';
 
 function CreateEventModal() {
     const { userData } = useContext(AppContext);
@@ -22,6 +23,17 @@ function CreateEventModal() {
 
     const urlPath = useLocation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (userData) {
+            const getUserDetails = async () => {
+                const userObject = await getUserByHandle(userData.handle);
+                setIsPublic(userObject.newEventsPublic);
+            }
+
+            getUserDetails();
+        }
+    }, [userData]);
 
     useEffect(() => {
         setTitle('');

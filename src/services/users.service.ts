@@ -7,8 +7,9 @@ import {
     orderByChild,
     update,
 } from 'firebase/database';
-import { db } from '../config/firebase-config';
+import { db, storage } from '../config/firebase-config';
 import type { UserData } from '../providers/UserContext';
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
 export const getUserByHandle = async (handle: string): Promise<UserData> => {
     const snapshot = await get(ref(db, `users/${handle}`));
@@ -86,6 +87,8 @@ export const createUserObject = async (
             isAdmin: false,
             isBlocked: false,
             prefersFullName: false,
+            newEventsPublic: false,
+            openInvites: true,
             createdOn: `${Date.now()}`,
         });
     } catch (error) {
@@ -106,6 +109,50 @@ export const getUserData = async (uid: string) => {
     }
 };
 
+export const updateUserProfileFields = async (
+    handle: string,
+    fields: Partial<Pick<UserData, "bio" | "firstName" | "lastName" | "phoneNumber" | "newEventsPublic" | "openInvites">>
+): Promise<void> => {
+    try {
+        await update(ref(db, `users/${handle}`), fields);
+    } catch (error) {
+        console.error("Error updating user profile fields:", error);
+    }
+};
+
+export const uploadProfileImage = async (userData: UserData, file: File): Promise<string | null> => {
+    try {
+        const fileRef = storageRef(storage, `${userData.uid}/profileImg`);
+        await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(fileRef);
+
+        await update(ref(db), {
+            [`/users/${userData.handle}/profileImg`]: url
+        });
+
+        return url;
+    } catch (error) {
+        console.error("Error uploading profile image:", error);
+        return null;
+    }
+};
+
+export const removeProfileImage = async (userData: UserData): Promise<boolean> => {
+    try {
+        const fileRef = storageRef(storage, `${userData.uid}/profileImg`);
+        await deleteObject(fileRef);
+
+        await update(ref(db), {
+            [`/users/${userData.handle}/profileImg`]: null
+        });
+
+        return true;
+    } catch (error) {
+        console.error("Error removing profile image:", error);
+        return false;
+    }
+};
+
 export const getProfileImageUrl = async (
     handle: string
 ): Promise<string | null> => {
@@ -117,7 +164,7 @@ export const getProfileImageUrl = async (
             return null;
         }
     } catch (error) {
-        console.error('Error in getProfileImageUrl:', error);
+        console.error('Error in getting profile image:', error);
         // throw error;
         return null;
     }
@@ -239,6 +286,24 @@ export const addNewContactList = async (loggedInUser: UserData, listName: string
     }
     catch (error) {
         console.error(`Failed adding new contact list for current user "${loggedInUser.handle}": `, error);
+        return null;
+    }
+}
+
+export const removeContactList = async (loggedInUser: UserData, listName: string) => {
+    try {
+        const userObject = await getUserByHandle(loggedInUser.handle);
+        if (userObject.contacts && userObject.contacts[listName]) {
+            await update(ref(db), {
+                [`/users/${loggedInUser.handle}/contacts/${listName}`]: null
+            });
+            return true;
+        } else {
+            return false;
+        }
+    }
+    catch (error) {
+        console.error(`Failed removing contact "${listName}" list for current user "${loggedInUser.handle}": `, error);
         return null;
     }
 }

@@ -178,33 +178,36 @@ function OtherAccountsDetails({userObject, events}: OtherAccountProps) {
             <div className="w-full p-4 bg-base-200 rounded-box overflow-x-hidden">
                 {accDetails === 1 && 
                     <AnimatedPage direction="left">
-                        <div className="flex flex-row justify-end items-center pb-4">
-                            
-                        </div>
                         <div className="flex flex-col gap-4 w-full">
-                            {events.map((event, index) => (
-                                <div key={index*5.481} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box">
-                                    <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
-                                    <div className="flex flex-col gap-4 w-full p-2">
-                                    <p className="text-xl text-primary-content">{event.title}</p>
-                                    <p className="text-xl text-primary-content">{event.start} - {event.end}</p>
-                                    <p className="text-xl text-primary-content">{event?.location}</p>
+                            {events.length > 0 
+                                ? events.map((event, index) => (
+                                    <div key={index*5.481} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box">
+                                        <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
+                                        <div className="flex flex-col gap-4 w-full p-2">
+                                        <p className="text-xl text-primary-content">{event.title}</p>
+                                        <p className="text-xl text-primary-content">{event.start} - {event.end}</p>
+                                        <p className="text-xl text-primary-content">{event?.location}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                                : <>
+                                    <p className="text-2xl w-[70%] self-center text-center text-base-content"><strong>{userObject.handle}</strong> has no events to show.</p>
+                                    <p className="text-xl w-[70%] self-center text-center text-base-content/70">This may be because you don't participate in any one of private their events, or they don't have any public ones.</p>
+                                </>
+                            }
                         </div>
                     </AnimatedPage>
                 }
                 {accDetails === 2 &&
                     <AnimatedPage direction="left">
                         <div className="flex flex-col gap-4 w-full">
-                            {mutualContacts.length
+                            {mutualContacts.length > 0
                                 ? mutualContacts.map((contact, index) => (
                                     <div key={index*23.75} className="flex flex-col gap-4 bg-primary w-full p-4 rounded-box">
                                         <p>{contact}</p>
                                     </div>
                                 ))
-                                : <p className="text-2xl w-full text-center">You and <strong>{userObject?.handle}</strong> have no mutual contacts.</p>
+                                : <p className="text-2xl w-full text-center text-base-content">You and <strong>{userObject?.handle}</strong> have no mutual contacts.</p>
                             }
                         </div>
                     </AnimatedPage>

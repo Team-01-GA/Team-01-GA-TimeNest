@@ -7,7 +7,8 @@ export const Icons = {
     USER_DEFAULT_PIC: 'fa-solid fa-user-tie',
     MENU: 'fa-solid fa-bars',
     ADD: 'fa-solid fa-plus',
-    REMOVE: 'fa-solid fa-minus'
+    REMOVE: 'fa-solid fa-minus',
+    X: 'fa-solid fa-xmark',
 } as const;
 
 export type Icons = (typeof Icons)[keyof typeof Icons] | null;

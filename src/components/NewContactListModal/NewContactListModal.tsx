@@ -34,7 +34,7 @@ function NewContactListModal() {
             }
             catch (error) {
                 console.error(`Error creating new contact list ${listName}: `, error);
-            } 
+            }
             finally {
                 setBlockCreate(false);
             }

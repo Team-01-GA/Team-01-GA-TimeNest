@@ -52,7 +52,7 @@ function Dropdown({ title, keyToOpen, clickCloses, children }: DialogProps) {
             // Use right instead of left
             style = {
                 top: dropdownPosition.top,
-                right: window.innerWidth - dropdownPosition.left, // 8px from the right edge
+                right: window.innerWidth - dropdownPosition.left,
                 position: "fixed",
                 padding: 0,
                 border: "none",

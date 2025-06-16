@@ -50,22 +50,25 @@ function Header({ calendarType, setCalendarType }: HeaderProps) {
                 <button onClick={() => setCalendarType(CalendarTypes.MONTH)} className="btn w-24 p-0 m-0 z-10 bg-transparent border-none text-xl text-base-content cursor-pointer">Month</button>
                 <button onClick={() => setCalendarType(CalendarTypes.YEAR)} className="btn w-24 p-0 m-0 z-10 bg-transparent border-none text-xl text-base-content cursor-pointer">Year</button>
             </div>
-            <div className="flex flex-row mr-16">
+            <div onClick={(e) => openDropdown(DropdownTypes.PROFILE_MODAL, e)} className="flex flex-row mr-16 items-center p-4 pt-2 pb-2 rounded-box bg-transparent transition-all cursor-pointer hover:bg-base-300">
+                <p className="text-2xl mr-4 cursor-pointer">{userData?.handle}</p>
                 {userPicture 
-                    ? <img onClick={(e) => openDropdown(DropdownTypes.PROFILE_MODAL, e)} className="w-12 h-12 rounded-[50%] cursor-pointer" src={userPicture} alt="Profile picture"/>
-                    : <div onClick={(e) => openDropdown(DropdownTypes.PROFILE_MODAL, e)} className="flex flex-row justify-center items-center w-12 h-12 rounded-[50%] bg-primary cursor-pointer">
-                        <i className={`${Icons.USER_DEFAULT_PIC} text-xl text-primary-content p-0 m-0`}></i>
+                    ? <img className="w-14 h-14 rounded-full cursor-pointer" src={userPicture} alt="Profile picture"/>
+                    : <div className="flex flex-row justify-center items-center w-14 h-14 rounded-full bg-primary cursor-pointer">
+                        <i className={`${Icons.USER_DEFAULT_PIC} text-xl text-primary-content p-0 m-0 cursor-pointer`}></i>
                     </div>
                 }
-                <Dropdown keyToOpen={DropdownTypes.PROFILE_MODAL} clickCloses={true}>
-                    <div className="flex flex-col gap-4 max-w-[300px] h-max">
-                        <button onClick={() => navigate(`/app/account/${userData?.handle}`)} className="btn btn-lg btn-neutral btn-outline w-full justify-start">My Account</button>
-                        <div className="flex flex-row items-center w-full gap-8 pr-4">
-                            <button onClick={logoutUser} className="btn btn-lg btn-error btn-outline justify-start">Logout</button>
-                            <ThemeSwitcher home={false} />
+                <div onClick={(e) => e.stopPropagation()}>
+                    <Dropdown keyToOpen={DropdownTypes.PROFILE_MODAL} clickCloses={true}>
+                        <div className="flex flex-col gap-4 max-w-[300px] h-max">
+                            <button onClick={() => navigate(`/app/account/${userData?.handle}`)} className="btn btn-lg btn-neutral btn-outline w-full justify-start">My Account</button>
+                            <div className="flex flex-row items-center w-full gap-8 pr-4">
+                                <button onClick={logoutUser} className="btn btn-lg btn-error btn-outline justify-start">Logout</button>
+                                <ThemeSwitcher home={false} />
+                            </div>
                         </div>
-                    </div>
-                </Dropdown>
+                    </Dropdown>
+                </div>
             </div>
         </nav>
     );

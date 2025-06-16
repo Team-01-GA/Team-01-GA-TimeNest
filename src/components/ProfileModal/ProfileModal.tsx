@@ -4,9 +4,11 @@ import UserContext, { type UserData } from "../../providers/UserContext";
 import { Icons } from "../../constants/icon.constants";
 import { useParams } from "react-router-dom";
 import { getProfileImageUrl, getUserByHandle } from "../../services/users.service";
-import { getAllEvents, type EventData } from "../../services/events.service";
+import { getUserEvents, type EventData } from "../../services/events.service";
 import MyAccountDetails from "./MyAccount";
 import OtherAccountsDetails from "./OtherAccounts";
+import { AnimatePresence, motion } from "framer-motion";
+import ProfileImagePicker from "./ProfileImagePicker";
 
 function ProfileModal() {
 
@@ -26,6 +28,7 @@ function ProfileModal() {
     const profileModalRef = useRef<HTMLDivElement>(null);
     const userToViewRef = useRef<HTMLParagraphElement>(null);
     const [inView, setInView] = useState(false);
+    const [changeProfilePic, setChangeProfilePic] = useState<boolean>(false);
 
     useEffect(() => {
         if (userData && userHandle) {
@@ -46,13 +49,9 @@ function ProfileModal() {
 
                     const userObject = await getUserByHandle(userHandle);
                     setOtherUser(userObject);
-                    const events = await getAllEvents();
-                    
-                    const handle = userObject.handle;
-                    
-                    const userParticipatingEvents = events.filter(event => event.participants.includes(handle));
+                    const events = await getUserEvents(userObject.handle);
 
-                    setUserEvents(userParticipatingEvents);
+                    setUserEvents(events);
                 }
                 catch (error) {
                     if (error instanceof Error) {
@@ -93,14 +92,29 @@ function ProfileModal() {
 
     return (
         <Modal title={`${modalTitle}${userData?.handle !== userHandle ? inView ? '' : ` - ${userHandle}` : ''}`} width="800px" ref={profileModalRef}>
+            <AnimatePresence>
+                {userData?.handle === userHandle && changeProfilePic && 
+                    <motion.div
+                        className="absolute top-0 left-0 w-full h-full bg-base-100 flex flex-col justify-center items-center gap-4 rounded-box z-50"
+                        initial={{ opacity: 0, clipPath: 'inset(0 0 0 100% round 1rem)' }}
+                        animate={{ opacity: 1, clipPath: 'inset(0 0 0 0 round 1rem)' }}
+                        exit={{ opacity: 0, clipPath: 'inset(0 0 0 100% round 1rem)' }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <p className="absolute top-0 left-0 mt-5 text-base-content text-4xl self-center justify-self-center w-full text-center font-bold bg-transparent">Change profile picture</p>
+                        <ProfileImagePicker setChangeProfilePic={setChangeProfilePic}/>
+                        <button onClick={() => setChangeProfilePic(false)} className="btn btn-secondary btn-lg w-[70%]">Back</button>
+                    </motion.div>
+                }
+            </AnimatePresence>
             <div className="relative flex flex-col items-center w-full gap-4">
                 {userPicture 
-                    ? <img className="w-24 h-24 rounded-[50%] cursor-pointer" src={userPicture} alt="Profile picture"/>
-                    : <div className="flex flex-row justify-center items-center w-24 h-24 rounded-[50%] bg-primary cursor-pointer">
+                    ? <img onClick={() => setChangeProfilePic(true)} className={`w-24 h-24 rounded-[50%] ${userData?.handle !== userHandle ? '' : 'cursor-pointer'}`} src={userPicture} alt="Profile picture"/>
+                    : <div onClick={() => setChangeProfilePic(true)} className={`flex flex-row justify-center items-center w-24 h-24 rounded-[50%] bg-primary ${userData?.handle !== userHandle ? '' : 'cursor-pointer'}`}>
                         <i className={`${Icons.USER_DEFAULT_PIC} text-3xl text-primary-content p-0 m-0`}></i>
                     </div>
                 }
-                <p className={`text-2xl transition-all duration-[0.3s] ${inView ? 'opacity-100' : 'opacity-0'}`} ref={userToViewRef}>{userToView}</p>
+                <p className={`text-3xl font-bold transition-all duration-[0.3s] ${inView ? 'opacity-100' : 'opacity-0'}`} ref={userToViewRef}>{userToView}</p>
                 {!loading
                     ? userHandle === userData?.handle
                         ? <MyAccountDetails events={userEvents} />
