@@ -8,6 +8,7 @@ import Dropdown from "../Dropdown/Dropdown";
 import { DropdownTypes } from "../../constants/dropdown.constants";
 import { logoutUser } from "../../services/auth.service";
 import ThemeSwitcher from "../ThemeSwitcher/ThemeSwitcher";
+import SearchBox from "./SearchBox";
 
 type HeaderProps = {
     calendarType: CalendarTypes;
@@ -39,7 +40,10 @@ function Header({ calendarType, setCalendarType }: HeaderProps) {
 
     return (
         <nav className="fixed z-40 top-0 left-0 flex flex-row justify-between items-center w-full h-24 bg-base-200 bg-gradient-to-b">
-            <h1 className="w-fit text-6xl text-base-content font-bold ml-16">TimeNest</h1>
+            <div className="flex flex-row gap-8 w-[35%] p-4 ml-16 h-full">
+                <h1 className="w-fit text-6xl text-base-content font-bold">TimeNest</h1>
+                <SearchBox />
+            </div>
             <div className="absolute top-1/2 left-1/2 transform translate-x-[-50%] translate-y-[-50%] flex flex-row items-center w-fit pt-2 pr-6 pb-2 pl-6 rounded-2xl bg-base-100">
                 <button className="bg-secondary rounded-box text-2xl absolute top-1/2 transform translate-y-[-50%] w-24 p-1 m-0 text-transparent z-0 pointer-events-none" style={higlighterStyles} disabled>
                     {calendarType === CalendarTypes.WEEK && 'Week'}

@@ -32,6 +32,8 @@ function MyAccountDetails({ events }: MyAccountProps) {
 
     const [newEventsPublic, setNewEventsPublic] = useState<boolean | null>(null);
     const [openInvites, setOpenInvites] = useState<boolean | null>(null);
+    const [showsInSearch, setShowsInSearch] = useState<boolean | null>(null);
+    const [sharesContacts, setSharesContacts] = useState<boolean | null>(null);
 
     const navigate = useNavigate();
 
@@ -108,6 +110,32 @@ function MyAccountDetails({ events }: MyAccountProps) {
         }
     }
 
+    const handleSaveShowsInSearch = async (state: boolean) => {
+        if (!userData) return;
+        if (state && !showsInSearch || !state && showsInSearch) {
+            await updateUserProfileFields(userData.handle, { showsInSearch: state });
+            setShowsInSearch(state);
+            if (state) {
+                showAlert(AlertTypes.INFO, 'Others can now look you up by your names, phone and email.');
+            } else {
+                showAlert(AlertTypes.INFO, 'You will no longer be showed in search results.');
+            }
+        }
+    }
+
+    const handleSaveShareContacts = async (state: boolean) => {
+        if (!userData) return;
+        if (state && !sharesContacts || !state && sharesContacts) {
+            await updateUserProfileFields(userData.handle, { sharesContacts: state });
+            setSharesContacts(state);
+            if (state) {
+                showAlert(AlertTypes.INFO, 'Others can now see your contacts.');
+            } else {
+                showAlert(AlertTypes.INFO, 'Your contacts are now hidden.');
+            }
+        }
+    }
+
     return (
         <>
 
@@ -128,12 +156,26 @@ function MyAccountDetails({ events }: MyAccountProps) {
                     <AnimatedPage direction="left">
                         <div className="flex flex-col gap-4 w-full">
                             {events.length > 0
-                                ? events.map((event, index) => (
-                                    <div key={index * 5.481} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box">
+                                ? events.map((event) => (
+                                    <div onClick={() => navigate(`/app/event/${event.id}`)} key={event.id} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box cursor-pointer">
                                         <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
                                         <div className="flex flex-col gap-4 w-full p-2">
                                             <p className="text-xl text-primary-content">{event.title}</p>
-                                            <p className="text-xl text-primary-content">{event.start} - {event.end}</p>
+                                            <p className="text-xl text-primary-content">
+                                                {new Date(event.start).toLocaleDateString()}
+                                                {' '}
+                                                {new Date(event.start).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                                {' '}-{' '}
+                                                {new Date(event.end).toLocaleDateString()}
+                                                {' '}
+                                                {new Date(event.end).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </p>
                                             <p className="text-xl text-primary-content">{event?.location}</p>
                                         </div>
                                     </div>
@@ -260,13 +302,25 @@ function MyAccountDetails({ events }: MyAccountProps) {
                                 <button onClick={() => handleSaveNewEventsPublic(true)} className={`btn btn-lg btn-neutral ${newEventsPublic ? 'cursor-default' : 'btn-outline'}`}>Public</button>
                                 <button onClick={() => handleSaveNewEventsPublic(false)} className={`btn btn-lg btn-neutral ${newEventsPublic ? 'btn-outline' : 'cursor-default'}`}>Private</button>
                             </div>
-                            <p className="text-xl text-base-content/80 mb-4">Choose whether new events will be either public or private by default.</p>
+                            <p className="text-xl text-base-content/80 pb-4 mb-4 border-b">Choose whether new events will be either public or private by default.</p>
                             <div className="flex gap-4 items-center">
                                 <p className="text-xl font-bold text-base-content">Open invites:</p>
                                 <button onClick={() => handleSaveOpenInvites(true)} className={`btn btn-lg btn-neutral ${openInvites ? 'cursor-default' : 'btn-outline'}`}>On</button>
                                 <button onClick={() => handleSaveOpenInvites(false)} className={`btn btn-lg btn-neutral ${openInvites ? 'btn-outline' : 'cursor-default'}`}>Off</button>
                             </div>
-                            <p className="text-xl text-base-content/80 mb-6">Choose whether others can invite you to their events. Won't affect events you already participate in.</p>
+                            <p className="text-xl text-base-content/80 pb-4 mb-4 border-b">Choose whether others can invite you to their events. Won't affect events you already participate in.</p>
+                            <div className="flex gap-4 items-center">
+                                <p className="text-xl font-bold text-base-content">Show in search:</p>
+                                <button onClick={() => handleSaveShowsInSearch(true)} className={`btn btn-lg btn-neutral ${showsInSearch ? 'cursor-default' : 'btn-outline'}`}>On</button>
+                                <button onClick={() => handleSaveShowsInSearch(false)} className={`btn btn-lg btn-neutral ${showsInSearch ? 'btn-outline' : 'cursor-default'}`}>Off</button>
+                            </div>
+                            <p className="text-xl text-base-content/80 pb-4 mb-4 border-b">Choose whether others search for you.</p>
+                            <div className="flex gap-4 items-center">
+                                <p className="text-xl font-bold text-base-content">Contacts:</p>
+                                <button onClick={() => handleSaveShareContacts(true)} className={`btn btn-lg btn-neutral ${sharesContacts ? 'cursor-default' : 'btn-outline'}`}>Public</button>
+                                <button onClick={() => handleSaveShareContacts(false)} className={`btn btn-lg btn-neutral ${sharesContacts ? 'btn-outline' : 'cursor-default'}`}>Private</button>
+                            </div>
+                            <p className="text-xl text-base-content/80 mb-12">Choose whether your contacts appear when others view their mutual contacts with you.</p>
                             <div className="flex flex-row gap-4 w-full">
                                 <button className="btn btn-error btn-lg btn-outline flex-1/2">Delete account</button>
                                 <button className="btn bg-pink-300 btn-dash btn-lg btn-outline flex-1/2 hover:animate-[rainbow_2s_ease_infinite]">?</button>

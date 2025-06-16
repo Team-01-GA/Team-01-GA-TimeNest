@@ -89,6 +89,7 @@ export const createUserObject = async (
             prefersFullName: false,
             newEventsPublic: false,
             openInvites: true,
+            showsInSearch: true,
             createdOn: `${Date.now()}`,
         });
     } catch (error) {
@@ -109,9 +110,26 @@ export const getUserData = async (uid: string) => {
     }
 };
 
+export const getAllUsers = async (): Promise<UserData[]> => {
+    try {
+        const snapshot = await get(ref(db, 'users'));
+
+        if (!snapshot.exists()) return [];
+
+        const usersObj = snapshot.val();
+
+        return Object.entries(usersObj)
+            .filter(([key]) => key !== '_init')
+            .map(([, value]) => value as UserData);
+    } catch (error) {
+        console.error('Error retrieving all users:', error);
+        return [];
+    }
+};
+
 export const updateUserProfileFields = async (
     handle: string,
-    fields: Partial<Pick<UserData, "bio" | "firstName" | "lastName" | "phoneNumber" | "newEventsPublic" | "openInvites">>
+    fields: Partial<Pick<UserData, "bio" | "firstName" | "lastName" | "phoneNumber" | "newEventsPublic" | "openInvites" | "sharesContacts" | "showsInSearch">>
 ): Promise<void> => {
     try {
         await update(ref(db, `users/${handle}`), fields);
