@@ -87,12 +87,12 @@ function Register({ loading, setLoading }: { loading: boolean; setLoading: React
             }
 
             const emailSnapshot = await getUserByEmail(normalisedEmail);
-            if (emailSnapshot) {
+            if (emailSnapshot.exists()) {
                 throw new Error(`Email ${normalisedEmail} has already been taken.`);
             }
 
             const phoneSnapshot = await getUserByPhone(fields.number);
-            if (phoneSnapshot) {
+            if (phoneSnapshot.exists()) {
                 throw new Error(`This phone number has been used too many times.`);
             }
 

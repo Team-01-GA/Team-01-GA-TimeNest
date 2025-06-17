@@ -11,12 +11,12 @@ import { db, storage } from '../config/firebase-config';
 import type { UserData } from '../providers/UserContext';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
-export const getUserByHandle = async (handle: string): Promise<UserData> => {
+export const getUserByHandle = async (handle: string): Promise<UserData | null> => {
     const snapshot = await get(ref(db, `users/${handle}`));
     if (snapshot.exists()) {
         return snapshot.val();
     } else {
-        throw new Error(`User not found for query: ${handle}`);
+        return null;
     }
 
 };
@@ -209,7 +209,7 @@ export const removeUserFromContactList = async (loggedInUser: UserData, handle: 
 export const removeUserFromAllContactLists = async (loggedInUser: UserData, handle: string): Promise<void> => {
     try {
         const userObject = await getUserByHandle(loggedInUser.handle);
-        if (userObject.contacts) {
+        if (userObject && userObject.contacts) {
             const updateObj: Record<string, null> = {};
 
             for (const [listName, contactsObj] of Object.entries(userObject.contacts)) {
@@ -231,8 +231,7 @@ export const removeUserFromAllContactLists = async (loggedInUser: UserData, hand
 
 export const getContactsAsContactListMaps = async (loggedInUser: UserData): Promise<{ listName: string; handlesMap: Record<string, boolean | null> }[]> => {
     try {
-        const userObject = await getUserByHandle(loggedInUser.handle);
-
+        const userObject = await getUserByHandle(loggedInUser.handle) as UserData;
         if (!userObject.contacts) {
             return [];
         }
@@ -253,7 +252,7 @@ export const getContactsAsContactListMaps = async (loggedInUser: UserData): Prom
 
 export const getAllContacts = async (handle: string): Promise<Set<string | never>> => {
     try {
-        const userObject = await getUserByHandle(handle);
+        const userObject = await getUserByHandle(handle) as UserData;
         let handles: string[] = [];
 
         if (userObject.contacts) {
@@ -291,7 +290,7 @@ export const checkUserInContacts = async (loggedInUser: UserData, handle: string
 
 export const addNewContactList = async (loggedInUser: UserData, listName: string) => {
     try {
-        const userObject = await getUserByHandle(loggedInUser.handle);
+        const userObject = await getUserByHandle(loggedInUser.handle) as UserData;
         const normalizedListName = listName.trim();
         if (!userObject.contacts || !userObject.contacts[normalizedListName]) {
             await update(ref(db), {
@@ -310,7 +309,7 @@ export const addNewContactList = async (loggedInUser: UserData, listName: string
 
 export const removeContactList = async (loggedInUser: UserData, listName: string) => {
     try {
-        const userObject = await getUserByHandle(loggedInUser.handle);
+        const userObject = await getUserByHandle(loggedInUser.handle) as UserData;
         if (userObject.contacts && userObject.contacts[listName]) {
             await update(ref(db), {
                 [`/users/${loggedInUser.handle}/contacts/${listName}`]: null

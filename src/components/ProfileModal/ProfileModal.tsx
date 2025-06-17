@@ -47,7 +47,7 @@ function ProfileModal() {
                         setUserPicture(url);
                     }
 
-                    const userObject = await getUserByHandle(userHandle);
+                    const userObject = await getUserByHandle(userHandle) as UserData;
                     setOtherUser(userObject);
                     const events = await getUserEvents(userObject.handle);
 

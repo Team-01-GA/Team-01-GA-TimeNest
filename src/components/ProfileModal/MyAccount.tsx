@@ -48,7 +48,7 @@ function MyAccountDetails({ events }: MyAccountProps) {
     useEffect(() => {
         if (userData) {
             const getUserDetails = async () => {
-                const userObject = await getUserByHandle(userData.handle);
+                const userObject = await getUserByHandle(userData.handle) as UserData;
 
                 setBioInput(userObject.bio ?? "");
                 setFirstNameInput(userObject.firstName ?? "");

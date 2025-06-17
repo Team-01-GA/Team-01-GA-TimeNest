@@ -4,6 +4,7 @@ import { Icons } from "../../constants/icon.constants";
 import { useNavigate } from "react-router-dom";
 import AlertContext from "../../providers/AlertContext";
 import { AlertTypes } from "../../constants/alert.constants";
+import type { UserData } from "../../providers/UserContext";
 
 function AdminUserList({ handle }: { handle: string }) {
 
@@ -28,7 +29,7 @@ function AdminUserList({ handle }: { handle: string }) {
                 const url = await getProfileImageUrl(handle);
                 setProfileImg(url);
     
-                const userObject = await getUserByHandle(handle);
+                const userObject = await getUserByHandle(handle) as UserData;
 
                 setIsAdmin(userObject.isAdmin ? 'Admin' : 'User');
                 setEvents(userObject.events ? Object.keys(userObject.events).length : 0);

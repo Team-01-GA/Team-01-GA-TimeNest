@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, useMemo } from 'react';
 import Modal from '../Modal/Modal';
-import AppContext from '../../providers/UserContext';
+import AppContext, { type UserData } from '../../providers/UserContext';
 import AlertContext from '../../providers/AlertContext';
 import { addEvent } from '../../services/events.service';
 import { AlertIcons, AlertTypes } from '../../constants/alert.constants';
@@ -28,7 +28,7 @@ function CreateEventModal() {
     useEffect(() => {
         if (userData) {
             const getUserDetails = async () => {
-                const userObject = await getUserByHandle(userData.handle);
+                const userObject = await getUserByHandle(userData.handle) as UserData;
                 setIsPublic(userObject.newEventsPublic);
             }
 
