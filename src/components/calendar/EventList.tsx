@@ -70,6 +70,18 @@ function EventList({ selectedDate, events }: EventListProps) {
                             })}
                         </p>
                         <p className="text-lg text-primary-content/80">{event.location}</p>
+                        <div className='badge badge-lg badge-neutral'>
+                            {event.isMultiDay && (
+                                <span>Multi-day</span>
+                            )}
+                            {event.recurrence && event.recurrence.length > 0 ? (
+                                <span>
+                                    {event.recurrence.includes('Monthly') ? 'Monthly' : 'Weekly'}
+                                </span>
+                            ) : !event.isMultiDay && (
+                                <span>Single Day</span>
+                            )}
+                        </div>
                         {event.createdBy !== userData?.handle && (
                             <p
                                 onClick={e => {
