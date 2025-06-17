@@ -35,7 +35,15 @@ function MyAccountDetails({ events }: MyAccountProps) {
     const [showsInSearch, setShowsInSearch] = useState<boolean | null>(null);
     const [sharesContacts, setSharesContacts] = useState<boolean | null>(null);
 
+    const [eventPage, setEventPage] = useState(1);
+    const EVENTS_PER_PAGE = 5;
+
     const navigate = useNavigate();
+
+    const paginatedEvents = events.slice(
+        (eventPage - 1) * EVENTS_PER_PAGE,
+        eventPage * EVENTS_PER_PAGE
+    );
 
     useEffect(() => {
         if (userData) {
@@ -54,6 +62,10 @@ function MyAccountDetails({ events }: MyAccountProps) {
             getUserDetails();
         }
     }, [userData]);
+
+    useEffect(() => {
+        setEventPage(1); // Reset page if events change
+    }, [events]);
 
     const higlighterStyles: CSSProperties = {
         left: accDetails === 1
@@ -156,32 +168,64 @@ function MyAccountDetails({ events }: MyAccountProps) {
                     <AnimatedPage direction="left">
                         <div className="flex flex-col gap-4 w-full">
                             {events.length > 0
-                                ? events.map((event) => (
-                                    <div onClick={() => navigate(`/app/event/${event.id}`)} key={event.id} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box cursor-pointer">
-                                        <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
-                                        <div className="flex flex-col gap-4 w-full p-2">
-                                            <p className="text-xl text-primary-content">{event.title}</p>
-                                            <p className="text-xl text-primary-content">
-                                                {new Date(event.start).toLocaleDateString()}
-                                                {' '}
-                                                {new Date(event.start).toLocaleTimeString([], {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                })}
-                                                {' '}-{' '}
-                                                {new Date(event.end).toLocaleDateString()}
-                                                {' '}
-                                                {new Date(event.end).toLocaleTimeString([], {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                })}
+                                ? <>
+                                    <div className="flex flex-row justify-between items-center mb-2">
+                                        <div />
+                                        <div className="flex gap-4 items-center">
+                                            <button
+                                                className="btn btn-md"
+                                                disabled={eventPage === 1}
+                                                onClick={() => setEventPage(p => p - 1)}
+                                            >
+                                                Prev
+                                            </button>
+                                            <p className="text-lg self-center">
+                                                Page {eventPage} of {Math.ceil(events.length / EVENTS_PER_PAGE)}
                                             </p>
-                                            <p className="text-xl text-primary-content">{event?.location}</p>
+                                            <button
+                                                className="btn btn-md"
+                                                disabled={eventPage === Math.ceil(events.length / EVENTS_PER_PAGE)}
+                                                onClick={() => setEventPage(p => p + 1)}
+                                            >
+                                                Next
+                                            </button>
                                         </div>
                                     </div>
-                                ))
+                                    {paginatedEvents.map((event) => (
+                                        <div onClick={() => navigate(`/app/event/${event.id}`)} key={event.id} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box cursor-pointer">
+                                            <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
+                                            <div className="relative flex flex-col gap-2 w-full p-2">
+                                                <p className="text-xl text-primary-content font-bold">{event.title}</p>
+                                                <p className="text-lg text-primary-content/80">
+                                                    {new Date(event.start).toLocaleDateString()}
+                                                    {' '}
+                                                    {new Date(event.start).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                    {' '}-{' '}
+                                                    {new Date(event.end).toLocaleDateString()}
+                                                    {' '}
+                                                    {new Date(event.end).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                </p>
+                                                <p className="text-lg text-primary-content/80">{event?.location}</p>
+                                                {event.createdBy !== userData?.handle && 
+                                                    <p onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/app/account/${event.createdBy}`)
+                                                    }} className="absolute bottom-0 right-0 text-md text-primary-content/80 p-2 rounded-box transition-all hover:bg-neutral hover:text-neutral-content">
+                                                        Created by {event.createdBy}
+                                                    </p>
+                                                }
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
                                 : <>
-                                    <p className="text-2xl w-[70%] self-center text-center text-base-content">You currently have no events.</p>
+                                    <p className="text-2xl w-[70%] self-center text-center text-base-content">You currently don't participate in any events.</p>
                                     <button onClick={() => navigate('/app/event/create')} className="btn btn-neutral btn-lg w-fit self-center">Create Event</button>
                                 </>
                             }
@@ -208,9 +252,9 @@ function MyAccountDetails({ events }: MyAccountProps) {
                                             onChange={e => setBioInput(e.target.value)}
                                             rows={4}
                                         />
-                                        <div className="flex justify-between mt-2">
-                                            <button className="btn btn-success btn-sm" onClick={handleSaveBio}>Save</button>
-                                            <button className="btn btn-neutral btn-sm" onClick={() => {
+                                        <div className="flex gap-2 w-full mt-2">
+                                            <button className="btn btn-success btn-sm flex-1" onClick={handleSaveBio}>Save</button>
+                                            <button className="btn btn-neutral btn-sm flex-1" onClick={() => {
                                                 setBioInput(userData?.bio ?? "");
                                                 setEditing(prev => ({ ...prev, bio: false }));
                                             }}>Cancel</button>
@@ -254,9 +298,9 @@ function MyAccountDetails({ events }: MyAccountProps) {
                                                 placeholder="Last name"
                                             />
                                         </div>
-                                        <div className="flex justify-between mt-2">
-                                            <button className="btn btn-success btn-sm" onClick={handleSaveName}>Save</button>
-                                            <button className="btn btn-neutral btn-sm" onClick={() => {
+                                        <div className="flex gap-2 w-full mt-2">
+                                            <button className="btn btn-success btn-sm flex-1" onClick={handleSaveName}>Save</button>
+                                            <button className="btn btn-neutral btn-sm flex-1" onClick={() => {
                                                 setFirstNameInput(userData?.firstName ?? "");
                                                 setLastNameInput(userData?.lastName ?? "");
                                                 setEditing(prev => ({ ...prev, name: false }));
@@ -281,9 +325,9 @@ function MyAccountDetails({ events }: MyAccountProps) {
                                             onChange={e => setPhoneInput(e.target.value)}
                                             placeholder="Phone number"
                                         />
-                                        <div className="flex justify-between mt-2">
-                                            <button className="btn btn-success btn-sm" onClick={handleSavePhone}>Save</button>
-                                            <button className="btn btn-neutral btn-sm" onClick={() => {
+                                        <div className="flex gap-2 w-full mt-2">
+                                            <button className="btn btn-success btn-sm flex-1" onClick={handleSavePhone}>Save</button>
+                                            <button className="btn btn-neutral btn-sm flex-1" onClick={() => {
                                                 setPhoneInput(userData?.phoneNumber ?? "");
                                                 setEditing(prev => ({ ...prev, phone: false }));
                                             }}>Cancel</button>
@@ -314,7 +358,7 @@ function MyAccountDetails({ events }: MyAccountProps) {
                                 <button onClick={() => handleSaveShowsInSearch(true)} className={`btn btn-lg btn-neutral ${showsInSearch ? 'cursor-default' : 'btn-outline'}`}>On</button>
                                 <button onClick={() => handleSaveShowsInSearch(false)} className={`btn btn-lg btn-neutral ${showsInSearch ? 'btn-outline' : 'cursor-default'}`}>Off</button>
                             </div>
-                            <p className="text-xl text-base-content/80 pb-4 mb-4 border-b">Choose whether others search for you.</p>
+                            <p className="text-xl text-base-content/80 pb-4 mb-4 border-b">Choose whether others can search for you.</p>
                             <div className="flex gap-4 items-center">
                                 <p className="text-xl font-bold text-base-content">Contacts:</p>
                                 <button onClick={() => handleSaveShareContacts(true)} className={`btn btn-lg btn-neutral ${sharesContacts ? 'cursor-default' : 'btn-outline'}`}>Public</button>

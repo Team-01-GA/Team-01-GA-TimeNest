@@ -118,7 +118,7 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
 
     return (
         <div className="flex flex-col w-full h-full overflow-y-auto">
-            <div className="flex items-center justify-between w-full pl-6 pr-6 mb-4 gap-4 shrink-0">
+            <div className="sticky top-0 z-10 flex bg-base-300 items-center justify-between w-full pl-6 pr-6 pb-4 gap-4 shrink-0">
                 <div className="flex items-center justify-start gap-4">
                     <h2 className="text-6xl font-bold text-center">
                         Week of {startOfWeek.toLocaleDateString('en-GB')}
@@ -163,14 +163,14 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
             </div>
 
             {/* <div className="grid grid-cols-8 w-full border-t border-l text-sm min-w-[900px]"> */}
-            <div className={`grid ${showWorkWeekOnly ? 'grid-cols-6' : 'grid-cols-8'} w-full border-t border-l text-sm min-w-[900px]`}>
+            <div className={`grid ${showWorkWeekOnly ? 'grid-cols-6' : 'grid-cols-8'} w-full border-l text-sm min-w-[900px]`}>
                 {/* Top Row: Time + Weekdays */}
-                <div className="bg-base-200 border-r border-b h-10 flex items-center justify-center font-semibold">Time</div>
+                <div className="sticky top-19 z-10 bg-base-200 border-t border-r border-b h-10 flex items-center justify-center font-semibold">Time</div>
                 {days.map((day, i) => (
                     <button
                         key={i}
                         onClick={() => setSelectedDate(day)}
-                        className={`bg-base-200 border-r border-b h-10 flex items-center justify-center font-semibold w-full ${isSameCalendarDay(day, selectedDate) ? 'bg-primary text-white' : ''} cursor-pointer`}
+                        className={`sticky top-19 z-10 bg-base-200 border-t border-r border-b h-10 flex items-center justify-center font-semibold w-full ${isSameCalendarDay(day, selectedDate) ? 'bg-primary text-white' : ''} cursor-pointer`}
                     >
                         {day.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' })}
                     </button>

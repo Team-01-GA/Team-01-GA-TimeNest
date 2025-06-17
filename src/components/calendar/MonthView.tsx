@@ -4,7 +4,7 @@ import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/cal
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
 import { Icons } from '../../constants/icon.constants';
 import { useNavigate } from 'react-router-dom';
-import { getUserEvents, type EventData } from '../../services/events.service';
+import { getAllEvents, type EventData } from '../../services/events.service';
 import UserContext from '../../providers/UserContext';
 
 type MonthViewProps = {
@@ -23,8 +23,14 @@ function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate 
         async function loadEvents() {
             if (!userData?.handle) return;
             try {
-                const events = await getUserEvents(userData.handle);
-                setAllEvents(events);
+                const events = await getAllEvents();
+                setAllEvents(
+                    events.filter(
+                        e =>
+                            e.createdBy === userData.handle ||
+                            (Array.isArray(e.participants) && e.participants.includes(userData.handle))
+                    )
+                );
             } catch (err) {
                 console.error('Failed to fetch events for calendar grid', err);
             }

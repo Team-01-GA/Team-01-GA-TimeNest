@@ -34,6 +34,14 @@ function OtherAccountsDetails({userObject, events}: OtherAccountProps) {
 
     const navigate = useNavigate();
 
+    const EVENTS_PER_PAGE = 5;
+    const [eventPage, setEventPage] = useState(1);
+
+    const paginatedEvents = events.slice(
+        (eventPage - 1) * EVENTS_PER_PAGE,
+        eventPage * EVENTS_PER_PAGE
+    );
+
     useEffect(() => {
         if (userObject && userData) {
             const getUserDetails = async () => {
@@ -135,6 +143,10 @@ function OtherAccountsDetails({userObject, events}: OtherAccountProps) {
         transition: 'all 0.3s ease'
     }
 
+    useEffect(() => {
+        setEventPage(1); // Reset page if events change
+    }, [events]);
+
     return (
         <>
             {userObject?.handle !== userData?.handle && 
@@ -180,16 +192,69 @@ function OtherAccountsDetails({userObject, events}: OtherAccountProps) {
                     <AnimatedPage direction="left">
                         <div className="flex flex-col gap-4 w-full">
                             {events.length > 0 
-                                ? events.map((event, index) => (
-                                    <div key={index*5.481} className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box">
-                                        <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
-                                        <div className="flex flex-col gap-4 w-full p-2">
-                                        <p className="text-xl text-primary-content">{event.title}</p>
-                                        <p className="text-xl text-primary-content">{event.start} - {event.end}</p>
-                                        <p className="text-xl text-primary-content">{event?.location}</p>
+                                ? <>
+                                    <div className="flex flex-row justify-between items-center mb-2">
+                                        <div />
+                                        <div className="flex gap-4 items-center">
+                                            <button
+                                                className="btn btn-md"
+                                                disabled={eventPage === 1}
+                                                onClick={() => setEventPage(p => p - 1)}
+                                            >
+                                                Prev
+                                            </button>
+                                            <p className="text-lg self-center">
+                                                Page {eventPage} of {Math.ceil(events.length / EVENTS_PER_PAGE)}
+                                            </p>
+                                            <button
+                                                className="btn btn-md"
+                                                disabled={eventPage === Math.ceil(events.length / EVENTS_PER_PAGE)}
+                                                onClick={() => setEventPage(p => p + 1)}
+                                            >
+                                                Next
+                                            </button>
                                         </div>
                                     </div>
-                                ))
+                                    {paginatedEvents.map((event) => (
+                                        <div
+                                            onClick={() => navigate(`/app/event/${event.id}`)}
+                                            key={event.id}
+                                            className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box cursor-pointer"
+                                        >
+                                            <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
+                                            <div className="relative flex flex-col gap-2 w-full p-2">
+                                                <p className="text-xl text-primary-content font-bold">{event.title}</p>
+                                                <p className="text-lg text-primary-content/80">
+                                                    {new Date(event.start).toLocaleDateString()}
+                                                    {' '}
+                                                    {new Date(event.start).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                    {' '}-{' '}
+                                                    {new Date(event.end).toLocaleDateString()}
+                                                    {' '}
+                                                    {new Date(event.end).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                </p>
+                                                <p className="text-lg text-primary-content/80">{event?.location}</p>
+                                                {event.createdBy !== userObject?.handle && 
+                                                    <p
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            navigate(`/app/account/${event.createdBy}`);
+                                                        }}
+                                                        className="absolute bottom-0 right-0 text-md text-primary-content/80 p-2 rounded-box transition-all hover:bg-neutral hover:text-neutral-content"
+                                                    >
+                                                        Created by {event.createdBy}
+                                                    </p>
+                                                }
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
                                 : <>
                                     <p className="text-2xl w-[70%] self-center text-center text-base-content"><strong>{userObject.handle}</strong> has no events to show.</p>
                                     <p className="text-xl w-[70%] self-center text-center text-base-content/70">This may be because you don't participate in any one of private their events, or they don't have any public ones.</p>

@@ -80,7 +80,7 @@ function SearchBox() {
             {searchQuery && (
                 <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-base-200 rounded-full p-1 pr-[0.45rem] pl-[0.45rem] hover:bg-base-300 transition-colors z-20"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-base-200 rounded-full p-1 pr-[0.45rem] pl-[0.45rem] hover:bg-base-300 transition-colors z-20 cursor-pointer"
                     onClick={() => {
                         setSearchQuery('');
                         inputRef.current?.focus();
@@ -164,19 +164,25 @@ function SearchBox() {
                                                         <div className="flex justify-between">
                                                             <h3 className="text-lg font-semibold transition-all text-accent-content group-hover:text-base-content">{event.title}</h3>
                                                         </div>
-                                                        <p className="text-base transition-all text-accent-content group-hover:text-base-content">
+                                                        <p className="text-base transition-all text-accent-content/80 group-hover:text-base-content/80">
+                                                            {new Date(event.start).toLocaleDateString()}
+                                                            {' '}
                                                             {new Date(event.start).toLocaleTimeString([], {
                                                                 hour: '2-digit',
                                                                 minute: '2-digit',
                                                             })}
                                                             {' '}-{' '}
+                                                            {new Date(event.end).toLocaleDateString()}
+                                                            {' '}
                                                             {new Date(event.end).toLocaleTimeString([], {
                                                                 hour: '2-digit',
                                                                 minute: '2-digit',
                                                             })}
-                                                            {event.location && `, ${event.location}`}
                                                         </p>
-                                                        <div className="flex justify-between mt-1">
+                                                        {event.location && <p className="text-base transition-all text-accent-content/80 group-hover:text-base-content/80">
+                                                            {event.location}
+                                                        </p>}
+                                                        <div className="flex justify-end w-full">
                                                             <p className="text-base transition-all text-accent-content group-hover:text-base-content">Created by {event.createdBy}</p>
                                                         </div>
                                                     </motion.div>

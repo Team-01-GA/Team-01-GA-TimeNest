@@ -2,7 +2,7 @@ import { ref, push, update, get, child } from 'firebase/database';
 import { db } from '../config/firebase-config';
 
 export interface EventData {
-    id?: string;
+    id: string;
     title: string;
     description?: string;
     start: string;
@@ -16,7 +16,7 @@ export interface EventData {
     isMultiDay?: boolean;
 }
 
-export const addEvent = async (event: EventData) => {
+export const addEvent = async (event: Omit<EventData, 'id'>) => {
     try {
         if (!event.title || event.title.length < 3 || event.title.length > 30) {
             throw new Error('Title must be between 3 and 30 characters.');
@@ -264,5 +264,50 @@ export const updateEvent = async (eventId: string, updatedData: Partial<EventDat
     } catch (err) {
         console.error("Failed to update event:", err);
         throw err;
+    }
+};
+
+export const addParticipantToEvent = async (eventId: string, participantHandle: string): Promise<void> => {
+    try {
+        const snapshot = await get(child(ref(db), `events/${eventId}`));
+        if (!snapshot.exists()) {
+            throw new Error('Event not found');
+        }
+        const event = snapshot.val() as EventData;
+
+        const participants = Array.isArray(event.participants) ? event.participants : [];
+        if (!participants.includes(participantHandle)) {
+            participants.push(participantHandle);
+
+            await update(ref(db, `events/${eventId}`), { participants });
+
+            if (participantHandle !== event.createdBy) {
+                await update(ref(db), {
+                    [`users/${participantHandle}/participatesIn/${eventId}`]: true,
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error adding participant to event:', error);
+    }
+};
+
+export const removeParticipantFromEvent = async (eventId: string, participantHandle: string): Promise<void> => {
+    try {
+        const snapshot = await get(child(ref(db), `events/${eventId}`));
+        if (!snapshot.exists()) throw new Error('Event not found');
+        const event = snapshot.val() as EventData;
+
+        const participants = Array.isArray(event.participants) ? event.participants : [];
+        const newParticipants = participants.filter((h: string) => h !== participantHandle);
+
+        await update(ref(db, `events/${eventId}`), { participants: newParticipants });
+
+        await update(ref(db), {
+            [`users/${participantHandle}/participatesIn/${eventId}`]: null,
+        });
+    } catch (error) {
+        console.error('Error removing participant from event:', error);
+        throw error;
     }
 };

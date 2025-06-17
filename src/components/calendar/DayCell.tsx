@@ -57,14 +57,14 @@ function DayCell({ date, isCurrentMonth, isToday, isSelected, onClick, allEvents
 
     return (
         <div
-            className={`${baseStyle}${monthStyle}${todayStyle}${weekendStyle}${selectedStyle}`}
+            className={`${baseStyle}${monthStyle}${todayStyle}${weekendStyle}${selectedStyle} rounded-box`}
             onClick={() => onClick?.(date)}
             data-date={date}
         >
             <div className="relative w-full h-full flex items-center justify-center">
-                {date.getDate()}
+                <p className='text-2xl'>{date.getDate()}</p>
                 {eventsForThisDay.length > 0 && (
-                    <span className="badge badge-sm badge-accent absolute bottom-1 right-1">
+                    <span className="badge badge-md badge-neutral absolute bottom-2 right-2">
                         {eventsForThisDay.length} events
                     </span>
                 )}

@@ -55,56 +55,45 @@ function EventList({ selectedDate }: EventListProps) {
 
     return (
         <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {events.map((event) => {
-                // Determine background color based on event type
-                let bgColor = 'bg-primary'; // Default for single day
-                if (event.isMultiDay) {
-                    bgColor = 'bg-secondary';
-                } else if (event.recurrence && event.recurrence.length > 0) {
-                    bgColor = event.recurrence.includes('Monthly') ? 'bg-info' : 'bg-warning';
-                }
-
-                return (
-                    <div
-                        key={event.id}
-                        className={`p-2 ${bgColor} text-primary-content rounded shadow cursor-pointer hover:brightness-90`}
-                        onClick={() => navigate(`/app/event/${event.id}`)}
-                    >
-                        <div className="flex justify-between">
-                            <h3 className="font-semibold">{event.title}</h3>
-                        </div>
-                        <p className="text-sm">
+            {events.map((event) => (
+                <div
+                    key={event.id}
+                    className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box cursor-pointer hover:brightness-90"
+                    onClick={() => navigate(`/app/event/${event.id}`)}
+                >
+                    <div className="w-2 min-h-full justify-self-stretch bg-primary-content rounded-box"></div>
+                    <div className="relative flex flex-col gap-2 w-full p-2">
+                        <p className="text-xl text-primary-content font-bold">{event.title}</p>
+                        <p className="text-lg text-primary-content/80">
+                            {new Date(event.start).toLocaleDateString()}
+                            {' '}
                             {new Date(event.start).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
-                            })}{' '}
-                            –{' '}
+                            })}
+                            {' '}-{' '}
+                            {new Date(event.end).toLocaleDateString()}
+                            {' '}
                             {new Date(event.end).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
                             })}
-                            {event.location && `, ${event.location}`}
                         </p>
-                        <div className="flex justify-between mt-1">
-                            <p className="text-xs text-primary-content/70">
+                        <p className="text-lg text-primary-content/80">{event.location}</p>
+                        {event.createdBy !== userData?.handle && (
+                            <p
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    navigate(`/app/account/${event.createdBy}`);
+                                }}
+                                className="absolute bottom-0 right-0 text-md text-primary-content/80 p-2 rounded-box transition-all hover:bg-neutral hover:text-neutral-content"
+                            >
                                 Created by {event.createdBy}
                             </p>
-                            <div className="flex gap-1">
-                                {event.isMultiDay && (
-                                    <span className="text-xs bg-accent text-accent-content px-1 rounded">Multi-day</span>
-                                )}
-                                {event.recurrence && event.recurrence.length > 0 ? (
-                                    <span className="text-xs bg-accent text-accent-content px-1 rounded">
-                                        {event.recurrence.includes('Monthly') ? 'Monthly' : 'Weekly'}
-                                    </span>
-                                ) : !event.isMultiDay && (
-                                    <span className="text-xs bg-accent text-accent-content px-1 rounded">Single Day</span>
-                                )}
-                            </div>
-                        </div>
+                        )}
                     </div>
-                );
-            })}
+                </div>
+            ))}
         </div>
     );
 }

@@ -61,8 +61,8 @@ constants/               → App-wide constants: icons, alert types, calendar vi
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/timenest.git
-cd timenest
+git clone https://github.com/Team-01-GA/Team-01-GA-TimeNest.git
+cd Team-01-GA-TimeNest
 ```
 
 ### 2. Install dependencies

@@ -37,7 +37,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal({ title, wid
                 <div
                     onClick={(e) => e.stopPropagation()}
                     ref={ref}
-                    className={`relative flex flex-col p-4 max-h-[60%] bg-base-100 rounded-box shadow-2xl shadow-base-300 outline-primary ${className}`}
+                    className={`relative flex flex-col p-4 max-h-[70%] bg-base-100 rounded-box shadow-2xl shadow-base-300 outline-primary ${className}`}
                     style={{ width }}
                 >
                     <div className="absolute z-[4] flex top-0 left-0 w-[calc(100%-2rem)] mr-8 h-20 bg-base-100/60 backdrop-blur-[3px] rounded-2xl">
