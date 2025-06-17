@@ -38,9 +38,9 @@ function SearchBox() {
                 const users = await getAllUsers();
                 const filteredUsers = users.filter(user => {
                     return user.showsInSearch && (
-                        user.handle.includes(searchQuery) ||
-                        user.firstName?.includes(searchQuery) || 
-                        user.lastName?.includes(searchQuery) ||
+                        user.handle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        user.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        user.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         user.phoneNumber === searchQuery ||
                         user.email === searchQuery
                     )
@@ -50,7 +50,11 @@ function SearchBox() {
             if (eventSearch) {
                 const events = await getAllEvents();
                 const filteredEvents = events.filter(event => {
-                    return event.isPublic && (event.title.includes(searchQuery) || event.description?.includes(searchQuery));
+                    return event.isPublic && (
+                        event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        event.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        event.location?.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
                 });
                 setSearchResultsEvents(filteredEvents);
             }

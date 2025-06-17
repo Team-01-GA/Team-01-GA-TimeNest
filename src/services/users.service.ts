@@ -129,7 +129,7 @@ export const getAllUsers = async (): Promise<UserData[]> => {
 
 export const updateUserProfileFields = async (
     handle: string,
-    fields: Partial<Pick<UserData, "bio" | "firstName" | "lastName" | "phoneNumber" | "newEventsPublic" | "openInvites" | "sharesContacts" | "showsInSearch">>
+    fields: Partial<Pick<UserData, "bio" | "firstName" | "lastName" | "phoneNumber" | "newEventsPublic" | "openInvites" | "sharesContacts" | "showsInSearch" | "isBlocked">>
 ): Promise<void> => {
     try {
         await update(ref(db, `users/${handle}`), fields);

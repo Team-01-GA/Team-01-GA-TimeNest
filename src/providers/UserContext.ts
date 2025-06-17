@@ -9,13 +9,16 @@ export interface UserData {
     phoneNumber: string;
     profileImg?: string;
     contacts?: { [key: string]: {[key: string]: true | null} | null };
+    events?: { [key: string]: true };
     sharesContacts?: boolean;
     bio?: string;
     createdOn: string;
-    isAdmin?: boolean;
+    isAdmin: boolean;
+    isBlocked: boolean;
     uid: string;
     newEventsPublic: boolean,
     openInvites: boolean,
+    showsInSearch: boolean,
     [key: string]: unknown;
 }
 // export interface UserData {

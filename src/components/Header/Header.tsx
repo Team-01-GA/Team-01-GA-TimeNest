@@ -40,7 +40,7 @@ function Header({ calendarType, setCalendarType }: HeaderProps) {
 
     return (
         <nav className="fixed z-40 top-0 left-0 flex flex-row justify-between items-center w-full h-24 bg-base-200 bg-gradient-to-b">
-            <div className="flex flex-row gap-8 w-[35%] p-4 ml-16 h-full">
+            <div className="flex flex-row gap-16 p-4 ml-16 h-full">
                 <h1 className="w-fit text-6xl text-base-content font-bold">TimeNest</h1>
                 <SearchBox />
             </div>
@@ -66,6 +66,7 @@ function Header({ calendarType, setCalendarType }: HeaderProps) {
                     <Dropdown keyToOpen={DropdownTypes.PROFILE_MODAL} clickCloses={true}>
                         <div className="flex flex-col gap-4 max-w-[300px] h-max">
                             <button onClick={() => navigate(`/app/account/${userData?.handle}`)} className="btn btn-lg btn-neutral btn-outline w-full justify-start">My Account</button>
+                            {userData?.isAdmin && <button onClick={() => navigate('/app/admin')} className="btn btn-lg btn-neutral btn-outline w-full justify-start">Admin</button>}
                             <div className="flex flex-row items-center w-full gap-8 pr-4">
                                 <button onClick={logoutUser} className="btn btn-lg btn-error btn-outline justify-start">Logout</button>
                                 <ThemeSwitcher home={false} />

@@ -27,6 +27,8 @@ import DropdownContext from './providers/DropdownContext';
 import NewContactListModal from './components/NewContactListModal/NewContactListModal';
 import EventDetailsRouteModal from './components/EventDetailsModal/EventDetailsRouteModal';
 import EditEventModal from './components/EditEventModal/EditEventModal';
+import AdminPanel from './components/AdminPanel/AdminPanel';
+import { logoutUser } from './services/auth.service';
 
 function App() {
     const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -154,6 +156,18 @@ function App() {
         </AnimatePresence>
     );
 
+    if (userData?.isBlocked) {
+        return (
+            <div className='fixed w-full h-full flex justify-center items-center'>
+                <div className='flex flex-col gap-4 p-8 bg-error/70 rounded-box'>
+                    <p className='text-3xl text-error-content'>You are blocked. Your access to TimeNest has been suspended until further notice.</p>
+                    <p className='text-xl text-error-content/80'>If you believe this was a mistake, please contact one of the admins and provide details on your situation.</p>
+                    <button onClick={logoutUser} className='btn btn-neutral btn-xl self-end'>Logout</button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <AppContext.Provider value={UserContextValue}>
             <AlertContext.Provider value={AlertContextValue}>
@@ -187,6 +201,7 @@ function App() {
                                                 <Route path='/app/account/create-list' element={<NewContactListModal />} />
                                                 <Route path='/app/event/:eventId' element={<EventDetailsRouteModal />} />
                                                 <Route path="/app/event/edit/:eventId" element={<EditEventModal />} />
+                                                {userData?.isAdmin && <Route path="/app/admin" element={<AdminPanel />} />}
                                             </Route>
                                             <Route path="*" element={<Navigate to="/app" replace />} />
                                         </>
