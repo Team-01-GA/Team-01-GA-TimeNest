@@ -73,6 +73,7 @@ export const addEvent = async (event: Omit<EventData, 'id'>) => {
         await update(ref(db), {
             [`events/${eventId}/id`]: eventId,
             [`users/${event.createdBy}/events/${eventId}`]: true,
+            [`users/${event.createdBy}/participatesIn/${eventId}`]: true,
         });
 
         return eventId;
@@ -163,7 +164,8 @@ export const deleteEvent = async (eventId: string, creatorHandle: string): Promi
     try {
         await update(ref(db), {
             [`events/${eventId}`]: null,
-            [`users/${creatorHandle}/events/${eventId}`]: null
+            [`users/${creatorHandle}/events/${eventId}`]: null,
+            [`users/${creatorHandle}/participatesIn/${eventId}`]: null,
         });
     } catch (error) {
         console.error('Error deleting event:', error);

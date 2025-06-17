@@ -1,61 +1,51 @@
-import { useContext, useEffect, useState } from 'react';
-import { getUserEventsForDate, type EventData } from '../../services/events.service';
+import { useContext } from 'react';
+import { type EventData } from '../../services/events.service';
 import UserContext from '../../providers/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 type EventListProps = {
     selectedDate: Date;
+    events: EventData[];
 };
 
-function EventList({ selectedDate }: EventListProps) {
-    const [events, setEvents] = useState<EventData[]>([]);
-    const [loading, setLoading] = useState(true);
-
+function EventList({ selectedDate, events }: EventListProps) {
     const navigate = useNavigate();
-
     const { userData } = useContext(UserContext);
-    
-    useEffect(() => {
-        async function fetchEvents() {
-            if (!userData?.handle) return;
 
-            setLoading(true);
-            try {
-                const filtered = await getUserEventsForDate(userData.handle, selectedDate);
+    // Filter events for the selected date, including daily/weekly/monthly recurring
+    const filtered = events.filter(event => {
+        const start = new Date(event.start);
+        const end = new Date(event.end);
+        const isSameDay = (d1: Date, d2: Date) =>
+            d1.getDate() === d2.getDate() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getFullYear() === d2.getFullYear();
 
-                filtered.sort((a, b) => {
-                    const aDate = new Date(a.start);
-                    const bDate = new Date(b.start);
-                    const aMinutes = aDate.getHours() * 60 + aDate.getMinutes();
-                    const bMinutes = bDate.getHours() * 60 + bDate.getMinutes();
-                    return aMinutes - bMinutes;
-                });
-
-                setEvents(filtered);
-            } catch (e) {
-                console.error('Failed to fetch events:', e);
-            } finally {
-                setLoading(false);
-            }
+        // Daily recurring support
+        if (event.recurrence && event.recurrence.includes('Daily') && selectedDate >= start) {
+            return true;
         }
 
-        fetchEvents();
-    }, [selectedDate, userData?.handle]);
-
-    // if (loading) return <p className="p-2">Loading events...</p>;
-    if (loading) {
+        // Weekly/Monthly/other logic
         return (
-            <div className="flex justify-center items-center h-32">
-                <div className="loader"></div>
-            </div>
+            isSameDay(start, selectedDate) ||
+            (event.isMultiDay && selectedDate >= start && selectedDate <= end) ||
+            (
+                event.recurrence &&
+                selectedDate >= start &&
+                (
+                    (event.recurrence.includes('Monthly') && selectedDate.getDate() === start.getDate()) ||
+                    event.recurrence.includes(selectedDate.toLocaleString('en-US', { weekday: 'long' }))
+                )
+            )
         );
-    }
+    });
 
-    if (events.length === 0) return <p className="p-2 text-sm">No events for this day.</p>;
+    if (filtered.length === 0) return <p className="p-2 text-sm">No events for this day.</p>;
 
     return (
         <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {events.map((event) => (
+            {filtered.map((event) => (
                 <div
                     key={event.id}
                     className="flex flex-row gap-4 bg-primary w-full h-fit p-4 rounded-box cursor-pointer hover:brightness-90"

@@ -2,12 +2,14 @@ import { useState, type CSSProperties } from 'react';
 import EventList from './EventList';
 import ContactList from './ContactList';
 import { AnimatePresence, motion } from 'framer-motion'; // Add this import
+import type { EventData } from '../../services/events.service';
 
 type SidebarProps = {
     selectedDate: Date;
+    events: EventData[];
 };
 
-function Sidebar({ selectedDate }: SidebarProps) {
+function Sidebar({ selectedDate, events }: SidebarProps) {
 
     const [activeTab, setActiveTab] = useState<'Day' | 'Contacts'>('Day');
 
@@ -65,7 +67,7 @@ function Sidebar({ selectedDate }: SidebarProps) {
                             transition={{ duration: 0.3, ease: "easeInOut" }}
                             className="w-full"
                         >
-                            <EventList selectedDate={selectedDate} />
+                            <EventList selectedDate={selectedDate} events={events} />
                         </motion.div>
                     ) : (
                         <motion.div

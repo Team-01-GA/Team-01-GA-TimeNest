@@ -1,23 +1,20 @@
-import { useEffect, useMemo, useState, useContext } from 'react';
-import { getUserEvents, type EventData } from '../../services/events.service';
+import { useEffect, useMemo, useState } from 'react';
 import { getStartOfWeek, isSameCalendarDay, addDays } from '../../utils/calendar.utils';
 import { Icons } from '../../constants/icon.constants';
 import { useNavigate } from 'react-router-dom';
-import UserContext from '../../providers/UserContext';
+import type { EventData } from '../../services/events.service';
 
 type WeekViewProps = {
     selectedDate: Date;
     setSelectedDate: (date: Date) => void;
+    events: EventData[];
 };
 
-function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
-    const [events, setEvents] = useState<EventData[]>([]);
+function WeekView({ selectedDate, setSelectedDate, events }: WeekViewProps) {
     const [startOfWeek, setStartOfWeek] = useState(getStartOfWeek(selectedDate));
     const [showWorkWeekOnly, setShowWorkWeekOnly] = useState(() => {
         return localStorage.getItem('showWorkWeekOnly') === 'true';
     });
-
-    const { userData } = useContext(UserContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,19 +26,6 @@ function WeekView({ selectedDate, setSelectedDate }: WeekViewProps) {
         const allDays = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek, i));
         return showWorkWeekOnly ? allDays.slice(0, 5) : allDays;
     }, [startOfWeek, showWorkWeekOnly]);
-
-    useEffect(() => {
-        async function fetchEvents() {
-            if (!userData?.handle) return;
-            try {
-                const userEvents = await getUserEvents(userData.handle);
-                setEvents(userEvents);
-            } catch (err) {
-                console.error('Failed to fetch events for week view', err);
-            }
-        }
-        fetchEvents();
-    }, [userData?.handle]);
 
     function getEventsForDayAndHour(day: Date, hour: number): EventData[] {
         return events.filter((event) => {

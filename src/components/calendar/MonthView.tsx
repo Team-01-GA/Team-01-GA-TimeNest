@@ -1,42 +1,20 @@
-import { useContext, useState, useEffect } from 'react';
 import DayCell from './DayCell';
 import { getMonthStartForCalendarGrid, isSameCalendarDay } from '../../utils/calendar.utils';
 import { WEEKDAY_LABELS } from '../../constants/calendar.constants';
 import { Icons } from '../../constants/icon.constants';
 import { useNavigate } from 'react-router-dom';
-import { getAllEvents, type EventData } from '../../services/events.service';
-import UserContext from '../../providers/UserContext';
+import type { EventData } from '../../services/events.service';
 
 type MonthViewProps = {
     selectedDate: Date;
     setSelectedDate: (date: Date) => void;
     visibleDate: Date;
     setVisibleDate: React.Dispatch<React.SetStateAction<Date>>;
+    events: EventData[];
 };
 
-function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate }: MonthViewProps) {
-    const [allEvents, setAllEvents] = useState<EventData[]>([]);
-    const { userData } = useContext(UserContext);
+function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate, events }: MonthViewProps) {
     const navigate = useNavigate();
-
-    useEffect(() => {
-        async function loadEvents() {
-            if (!userData?.handle) return;
-            try {
-                const events = await getAllEvents();
-                setAllEvents(
-                    events.filter(
-                        e =>
-                            e.createdBy === userData.handle ||
-                            (Array.isArray(e.participants) && e.participants.includes(userData.handle))
-                    )
-                );
-            } catch (err) {
-                console.error('Failed to fetch events for calendar grid', err);
-            }
-        }
-        loadEvents();
-    }, [userData?.handle]);
 
     function goToPreviousMonth() {
         const prev = new Date(visibleDate);
@@ -57,7 +35,6 @@ function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate 
 
     const start = getMonthStartForCalendarGrid(visibleDate);
     const currentMonth = visibleDate.getMonth();
-
     const days = [...Array(42)].map((_, i) => {
         const date = new Date(start);
         date.setDate(start.getDate() + i);
@@ -103,7 +80,7 @@ function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate 
                         isCurrentMonth={date.getMonth() === currentMonth}
                         onClick={() => setSelectedDate(date)}
                         isSelected={isSameCalendarDay(date, selectedDate)}
-                        allEvents={allEvents}
+                        allEvents={events}
                     />
                 ))}
             </div>

@@ -81,7 +81,7 @@ function EventDetailsModal({ event }: { event: EventData }) {
         try {
             await deleteEvent(event.id!, event.createdBy);
             showAlert(AlertTypes.SUCCESS, "Event deleted successfully.");
-            navigate('/app/calendar', { replace: true });
+            navigate(-1);
         } catch (err) {
             console.error("Failed to delete event", err);
             showAlert(AlertTypes.ERROR, "Failed to delete event.");

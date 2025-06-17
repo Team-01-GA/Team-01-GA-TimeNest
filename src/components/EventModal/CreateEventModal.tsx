@@ -110,8 +110,7 @@ function CreateEventModal() {
             });
 
             showAlert(AlertTypes.SUCCESS, 'Event created successfully!');
-            // navigate(-1);
-            navigate('/app/calendar', { replace: true });
+            navigate(-1);
         } catch (e: unknown) {
             if (e instanceof Error) {
                 showAlert(AlertTypes.ERROR, e.message);
