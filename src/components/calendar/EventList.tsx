@@ -41,7 +41,7 @@ function EventList({ selectedDate, events }: EventListProps) {
         );
     });
 
-    if (filtered.length === 0) return <p className="p-2 text-sm">No events for this day.</p>;
+    if (filtered.length === 0) return <p className="mt-8 text-xl w-full text-center">No events for this day.</p>;
 
     return (
         <div className="flex-1 overflow-y-auto p-2 space-y-2">

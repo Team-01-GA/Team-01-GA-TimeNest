@@ -110,15 +110,15 @@ function EventDetailsModal({ event }: { event: EventData }) {
                     {event.location && <p className="text-xl text-base-content/70 w-full text-center">{event.location}</p>}
                     <p className="text-lg text-base-content/70 w-full text-center">{new Date(event.start).toLocaleString()}{' - '}{new Date(event.end).toLocaleString()}</p>
                 </div>
-                {participants?.length > 0 && participants.some(user => user !== event.createdBy) 
+                {participants?.length > 0 
                         ? <div className="flex flex-col gap-2 p-4 mt-4 bg-secondary rounded-box">
                             <div className="flex justify-between">
-                                <p className="text-lg text-secondary-content/90">Participants ({participants.length - 1})</p>
+                                <p className="text-lg text-secondary-content/90">Participants ({participants.length})</p>
                                 {userData?.handle === event.createdBy && <button className="btn btn-md btn-neutral btn-outline" onClick={handleOpenParticipantsDropdown}>Edit</button>}
                             </div>
                             <ul className="flex flex-wrap justify-center gap-2 max-h-32 overflow-y-auto p-2">
                                 {participants.map((handle) => {
-                                    if (handle !== event.createdBy) {
+                                    if (handle) {
                                         return (
                                             <div key={handle}>
                                                 {!location.pathname.includes('welcome')
