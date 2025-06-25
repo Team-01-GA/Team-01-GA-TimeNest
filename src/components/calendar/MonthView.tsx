@@ -44,13 +44,15 @@ function MonthView({ selectedDate, setSelectedDate, visibleDate, setVisibleDate,
     return (
         <div className="w-full h-full flex flex-col">
             {/* Month Header */}
-            <div className="flex items-center justify-between w-full pl-6 pr-6 mb-4 gap-4 shrink-0">
+            <div className="relative flex items-center justify-between w-full pl-6 pr-6 mb-4 gap-4 shrink-0">
                 <div className='flex items-center justify-start gap-4'>
+                    <div className='flex gap-4 absolute top-1/2 left-1/2 transform translate-y-[-50%] translate-x-[-50%]'>
+                        <button className="btn btn-xl" onClick={goToPreviousMonth}>←</button>
+                        <button className="btn btn-xl" onClick={goToNextMonth}>→</button>
+                    </div>
                     <h2 className="text-6xl font-semibold">
                         {visibleDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
                     </h2>
-                    <button className="btn btn-xl" onClick={goToPreviousMonth}>←</button>
-                    <button className="btn btn-xl" onClick={goToNextMonth}>→</button>
                 </div>
                 <div className='flex items-center justify-start gap-4'>
                     <button className='btn btn-xl' onClick={goToToday}>Today</button>

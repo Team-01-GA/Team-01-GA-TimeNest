@@ -133,7 +133,7 @@ function EditEventModal() {
                 isMultiDay,
             });
             showAlert(AlertTypes.SUCCESS, 'Event updated successfully.');
-            navigate('/app/calendar', { replace: true });
+            navigate(-1);
         } catch (error) {
             console.error(error);
             showAlert(AlertTypes.ERROR, 'Failed to update event.');

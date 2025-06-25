@@ -70,7 +70,17 @@ function EventList({ selectedDate, events }: EventListProps) {
                             })}
                         </p>
                         <p className="text-lg text-primary-content/80">{event.location}</p>
-                        <div className='badge badge-lg badge-neutral'>
+                        <div
+                            className={`badge badge-lg outline ${
+                                event.isMultiDay
+                                    ? 'badge-secondary'
+                                    : event.recurrence && event.recurrence.length > 0
+                                        ? event.recurrence.includes('Monthly')
+                                            ? 'badge-info'
+                                            : 'badge-neutral'
+                                        : 'badge-primary'
+                            }`}
+                        >
                             {event.isMultiDay && (
                                 <span>Multi-day</span>
                             )}

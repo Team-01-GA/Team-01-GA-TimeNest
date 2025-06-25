@@ -68,11 +68,11 @@ function EventDetailsModal({ event }: { event: EventData }) {
         if (participants.includes(handle)) {
             await removeParticipantFromEvent(event.id, handle);
             setParticipants(prev => prev.filter(h => h !== handle));
-            showAlert(AlertTypes.INFO, `${handle} is now set as a participant to this event.`);
+            showAlert(AlertTypes.INFO, `${handle} is no longer a participant of this event.`);
         } else {
             await addParticipantToEvent(event.id, handle);
             setParticipants(prev => [...prev, handle]);
-            showAlert(AlertTypes.INFO, `${handle} is no longer a participant of this event.`);
+            showAlert(AlertTypes.INFO, `${handle} is now set as a participant to this event.`);
         }
         setLoadingParticipance(false);
     };
@@ -93,6 +93,7 @@ function EventDetailsModal({ event }: { event: EventData }) {
             <Modal title={'Event Details'} width="600px">
                 <div className="flex flex-col gap-2 p-4 bg-base-300 rounded-box">
                     {event.createdOn && <p className="text-md w-full text-center text-base-content/70">Created on {new Date(event.createdOn).toLocaleString()}</p>}
+                    <p className="text-md w-full text-center text-base-content/70">{event.isPublic ? 'Public' : 'Private'}</p>
                     <p className="text-3xl font-bold w-full text-center">{event.title}</p>
                     <div onClick={() => {
                         if (!location.pathname.includes('welcome')) navigate(`/app/account/${event.createdBy}`);

@@ -133,6 +133,31 @@ function HomePage() {
                         <AnimatedOutlet />
                     </NewUserContext.Provider>
                 </div>
+                <div className="absolute bottom-20 flex flex-col items-center justify-center gap-6 w-full">
+                    <p className="text-2xl">Built with</p>
+                    <div className="flex flex-row gap-8">
+                        <div className="flex flex-row gap-4 items-center">
+                            <img className="rounded-lg" width={40} height={40} src="./ts-logo.png" alt="Tailwind logo" />
+                            <p className="text-xl">TypeScript</p>
+                        </div>
+                        <div className="flex flex-row gap-4 items-center">
+                            <img className="rounded-lg" width={40} height={40} src="./react-logo.png" alt="React logo" />
+                            <p className="text-xl">React</p>
+                        </div>
+                        <div className="flex flex-row gap-4 items-center">
+                            <img className="rounded-lg" width={40} height={40} src="./firebase-logo.png" alt="Firebase logo" />
+                            <p className="text-xl">Firebase</p>
+                        </div>
+                        <div className="flex flex-row gap-4 items-center">
+                            <img className="rounded-lg" width={40} height={40} src="./tailwind-logo.png" alt="Tailwind logo" />
+                            <p className="text-xl">Tailwind</p>
+                        </div>
+                        <div className="flex flex-row gap-4 items-center">
+                            <img className="rounded-lg" width={40} height={40} src="./daisyui-logo.png" alt="daisyUI logo" />
+                            <p className="text-xl">daisyUI</p>
+                        </div>
+                    </div>
+                </div>
             </AnimatedPage>
         </>
     )

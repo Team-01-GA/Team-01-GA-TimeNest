@@ -104,11 +104,13 @@ function WeekView({ selectedDate, setSelectedDate, events }: WeekViewProps) {
         <div className="flex flex-col w-full h-full overflow-y-auto">
             <div className="sticky top-0 z-10 flex bg-base-300 items-center justify-between w-full pl-6 pr-6 pb-4 gap-4 shrink-0">
                 <div className="flex items-center justify-start gap-4">
+                    <div className='flex gap-4 absolute top-[40%] left-1/2 transform translate-y-[-50%] translate-x-[-50%]'>
+                        <button className="btn btn-xl" onClick={goPrevWeek}>←</button>
+                        <button className="btn btn-xl" onClick={goNextWeek}>→</button>
+                    </div>
                     <h2 className="text-6xl font-bold text-center">
                         Week of {startOfWeek.toLocaleDateString('en-GB')}
                     </h2>
-                    <button className="btn btn-xl" onClick={goPrevWeek}>←</button>
-                    <button className="btn btn-xl" onClick={goNextWeek}>→</button>
                 </div>
                 <div className='flex items-center justify-start gap-4'>
                     <div className="flex items-center gap-2">
@@ -227,7 +229,7 @@ function WeekView({ selectedDate, setSelectedDate, events }: WeekViewProps) {
                                         } else if (event.recurrence && event.recurrence.length > 0) {
                                             eventBgColor = event.recurrence.includes('Monthly')
                                                 ? 'bg-info text-info-content'
-                                                : 'bg-warning text-warning-content';
+                                                : 'bg-neutral text-neutral-content';
                                         }
 
                                         return (
